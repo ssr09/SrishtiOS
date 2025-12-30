@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useSyncedStorage } from '../../hooks/useSyncedStorage';
 import type { Food } from '../../../apps/food-friends/foodDatabase';
 import { defaultFoods } from '../../../apps/food-friends/foodDatabase';
 
 export const FoodsTab: React.FC = () => {
-  const [foods, setFoods] = useLocalStorage<Food[]>('srishti-foods', defaultFoods);
+  const [foods, setFoods] = useSyncedStorage<Food[]>('foods', defaultFoods);
   const [newFood, setNewFood] = useState({
     name: '',
     emoji: '',

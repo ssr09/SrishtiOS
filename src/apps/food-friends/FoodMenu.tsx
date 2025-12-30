@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
+import { useSyncedStorage } from '../../shared/hooks/useSyncedStorage';
 import { usePrint } from '../../shared/hooks/usePrint';
 import { AppHeader } from '../../shared/components/AppHeader';
 import { SelectableCard } from '../../shared/components/SelectableCard';
@@ -8,7 +8,7 @@ import type { Food, MealTime } from './foodDatabase';
 import { defaultFoods, mealTimeConfig } from './foodDatabase';
 
 export const FoodMenu: React.FC = () => {
-  const [foods] = useLocalStorage<Food[]>('srishti-foods', defaultFoods);
+  const [foods] = useSyncedStorage<Food[]>('foods', defaultFoods);
   const [selectedMealTime, setSelectedMealTime] = useState<MealTime>('breakfast');
   const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
   const { print } = usePrint();

@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useSyncedStorage } from '../../hooks/useSyncedStorage';
 import { apps } from '../../../HomePage';
 
 export const AppsTab: React.FC = () => {
-  const [archivedApps, setArchivedApps] = useLocalStorage<string[]>('srishti-archived-apps', []);
-  const [appLastUsed] = useLocalStorage<Record<string, number>>('srishti-app-last-used', {});
+  const [archivedApps, setArchivedApps] = useSyncedStorage<string[]>('archivedApps', []);
+  const [appLastUsed] = useSyncedStorage<Record<string, number>>('appLastUsed', {});
 
   const toggleArchive = (appId: string) => {
     if (archivedApps.includes(appId)) {

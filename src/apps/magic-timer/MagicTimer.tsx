@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
+import { useSyncedStorage } from '../../shared/hooks/useSyncedStorage';
 import { AppHeader } from '../../shared/components/AppHeader';
 import { timerPresets as defaultTimerPresets, particleTypes, formatTime } from './timerConfig';
 import type { ParticleType, TimerPreset } from './timerConfig';
 import { HourglassAnimation } from './animations/HourglassAnimation';
 
 export const MagicTimer: React.FC = () => {
-  const [timerPresets] = useLocalStorage<TimerPreset[]>('srishti-timer-presets', defaultTimerPresets);
+  const [timerPresets] = useSyncedStorage<TimerPreset[]>('timerPresets', defaultTimerPresets);
+  const [isMuted, setIsMuted] = useSyncedStorage<boolean>('timerMuted', false);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [totalTime, setTotalTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -17,10 +18,52 @@ export const MagicTimer: React.FC = () => {
   const [customMinutes, setCustomMinutes] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [isTock, setIsTock] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const progress = totalTime > 0 ? ((totalTime - timeRemaining) / totalTime) * 100 : 0;
   const timeRemainingPercent = totalTime > 0 ? (timeRemaining / totalTime) * 100 : 100;
+
+  // Play tick-tock sound
+  const playTickTock = () => {
+    if (isMuted) return;
+
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioContextRef.current;
+
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      // Alternate between tick (higher) and tock (lower)
+      oscillator.frequency.value = isTock ? 600 : 800;
+      oscillator.type = 'sine';
+
+      const now = ctx.currentTime;
+      gainNode.gain.setValueAtTime(0.15, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+      oscillator.start(now);
+      oscillator.stop(now + 0.05);
+
+      setIsTock(!isTock);
+    } catch {
+      // Audio not supported
+    }
+  };
+
+  // Play tick sound when timer ticks
+  useEffect(() => {
+    if (isRunning && !isPaused && timeRemaining > 0 && timeRemaining < totalTime) {
+      playTickTock();
+    }
+  }, [timeRemaining]);
 
   useEffect(() => {
     if (isRunning && !isPaused && timeRemaining > 0) {
@@ -283,6 +326,21 @@ export const MagicTimer: React.FC = () => {
               >
                 <span className="text-xl">⏹️</span>
                 <span className="hidden sm:inline">Stop</span>
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsMuted(!isMuted)}
+                className={`
+                  w-14 py-3 rounded-2xl font-bold text-lg transition-colors
+                  flex items-center justify-center
+                  ${isMuted
+                    ? 'bg-gray-400 hover:bg-gray-500 text-white'
+                    : 'bg-purple-500 hover:bg-purple-600 text-white'
+                  }
+                `}
+                title={isMuted ? 'Unmute' : 'Mute'}
+              >
+                <span className="text-xl">{isMuted ? '🔇' : '🔊'}</span>
               </motion.button>
             </div>
           )}

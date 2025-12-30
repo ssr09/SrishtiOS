@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
+import { useSyncedStorage } from '../../shared/hooks/useSyncedStorage';
 import { usePrint } from '../../shared/hooks/usePrint';
 import { AppHeader } from '../../shared/components/AppHeader';
 import { SelectableCard } from '../../shared/components/SelectableCard';
@@ -8,7 +8,7 @@ import type { BathToy } from './toyDatabase';
 import { defaultToys, categoryConfig } from './toyDatabase';
 
 export const BathBuddy: React.FC = () => {
-  const [toys] = useLocalStorage<BathToy[]>('srishti-bath-toys', defaultToys);
+  const [toys] = useSyncedStorage<BathToy[]>('bathToys', defaultToys);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedToys, setSelectedToys] = useState<string[]>([]);
   const { print } = usePrint();

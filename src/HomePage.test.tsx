@@ -2,6 +2,19 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { HomePage } from './HomePage';
 import { NavigationProvider } from './shared/contexts/NavigationContext';
+import { FamilyProvider } from './shared/contexts/FamilyContext';
+
+// Mock Firebase
+vi.mock('./shared/firebase/config', () => ({
+  db: {},
+}));
+
+vi.mock('firebase/firestore', () => ({
+  doc: vi.fn(),
+  getDoc: vi.fn(),
+  setDoc: vi.fn(),
+  onSnapshot: vi.fn(() => vi.fn()),
+}));
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -26,13 +39,15 @@ const renderHomePage = (options: RenderOptions = {}) => {
   const { archivedApps = [], appLastUsed = {} } = options;
 
   // Set localStorage directly before render
-  localStorage.setItem('srishti-archived-apps', JSON.stringify(archivedApps));
-  localStorage.setItem('srishti-app-last-used', JSON.stringify(appLastUsed));
+  localStorage.setItem('srishti-archivedApps', JSON.stringify(archivedApps));
+  localStorage.setItem('srishti-appLastUsed', JSON.stringify(appLastUsed));
 
   return render(
-    <NavigationProvider onNavigate={mockNavigate}>
-      <HomePage />
-    </NavigationProvider>
+    <FamilyProvider>
+      <NavigationProvider onNavigate={mockNavigate}>
+        <HomePage />
+      </NavigationProvider>
+    </FamilyProvider>
   );
 };
 

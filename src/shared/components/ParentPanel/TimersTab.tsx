@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useSyncedStorage } from '../../hooks/useSyncedStorage';
 import type { TimerPreset } from '../../../apps/magic-timer/timerConfig';
 import { timerPresets as defaultTimerPresets } from '../../../apps/magic-timer/timerConfig';
 
 export const TimersTab: React.FC = () => {
-  const [timerPresets, setTimerPresets] = useLocalStorage<TimerPreset[]>('srishti-timer-presets', defaultTimerPresets);
+  const [timerPresets, setTimerPresets] = useSyncedStorage<TimerPreset[]>('timerPresets', defaultTimerPresets);
   const [newTimer, setNewTimer] = useState({
     name: '',
     emoji: '',

@@ -124,6 +124,7 @@ CSS custom properties switched via `data-theme` attribute:
 
 ## Data Flow
 
+### Local-only data:
 ```
 User Action
     ↓
@@ -133,6 +134,43 @@ Side Effects (useEffect)
     ↓
 Persistent Storage (useLocalStorage → localStorage)
 ```
+
+### Synced data (with Firebase):
+```
+User Action
+    ↓
+Component State (useState)
+    ↓
+useSyncedStorage hook
+    ↓
+┌─────────────────┬─────────────────┐
+│   localStorage  │    Firestore    │
+│   (offline)     │    (cloud)      │
+└─────────────────┴─────────────────┘
+         ↑
+    Real-time listener updates state on other devices
+```
+
+## Cross-Device Sync
+
+**Technology**: Firebase Firestore
+
+**Authentication**: Family code (6-character alphanumeric)
+- Generated on first use, stored in localStorage
+- Shared manually between devices
+- Firestore path: `families/{familyCode}`
+
+**Synced Data**:
+- Theme preference
+- Archived apps list
+- App last-used timestamps
+- Custom foods, bath toys, timer presets
+- Star rewards, completed routines
+
+**Key Files**:
+- `src/shared/firebase/config.ts` - Firebase initialization
+- `src/shared/contexts/FamilyContext.tsx` - Family code management
+- `src/shared/hooks/useSyncedStorage.ts` - Synced storage hook
 
 ## Testing
 

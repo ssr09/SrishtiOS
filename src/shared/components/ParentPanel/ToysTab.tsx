@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useSyncedStorage } from '../../hooks/useSyncedStorage';
 import type { BathToy } from '../../../apps/bath-buddy/toyDatabase';
 import { defaultToys } from '../../../apps/bath-buddy/toyDatabase';
 
 export const ToysTab: React.FC = () => {
-  const [toys, setToys] = useLocalStorage<BathToy[]>('srishti-bath-toys', defaultToys);
+  const [toys, setToys] = useSyncedStorage<BathToy[]>('bathToys', defaultToys);
   const [newToy, setNewToy] = useState({
     name: '',
     emoji: '',

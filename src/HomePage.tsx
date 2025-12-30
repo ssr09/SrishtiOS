@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BigButton } from './shared/components/BigButton';
 import { ParentPanel } from './shared/components/ParentPanel';
 import { useNavigation, type AppRoute } from './shared/contexts/NavigationContext';
-import { useLocalStorage } from './shared/hooks/useLocalStorage';
+import { useSyncedStorage } from './shared/hooks/useSyncedStorage';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const apps = [
@@ -24,8 +24,8 @@ export const HomePage: React.FC = () => {
   const [showParentPanel, setShowParentPanel] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<number | null>(null);
   const [showArchived, setShowArchived] = useState(false);
-  const [archivedApps] = useLocalStorage<string[]>('srishti-archived-apps', []);
-  const [appLastUsed, setAppLastUsed] = useLocalStorage<Record<string, number>>('srishti-app-last-used', {});
+  const [archivedApps] = useSyncedStorage<string[]>('archivedApps', []);
+  const [appLastUsed, setAppLastUsed] = useSyncedStorage<Record<string, number>>('appLastUsed', {});
 
   const handleSettingsPress = () => {
     const timer = window.setTimeout(() => {

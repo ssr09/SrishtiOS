@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
+import { useSyncedStorage } from '../../shared/hooks/useSyncedStorage';
 import { useNavigation } from '../../shared/contexts/NavigationContext';
 import { CelebrationModal } from '../../shared/components/CelebrationModal';
 import { RoutineStep } from './RoutineStep';
@@ -14,7 +14,7 @@ interface CompletedSteps {
 export const DailyRoutine: React.FC = () => {
   const { goHome } = useNavigation();
   const [currentTimeOfDay, setCurrentTimeOfDay] = useState<TimeOfDay>(getCurrentTimeOfDay());
-  const [completedSteps, setCompletedSteps] = useLocalStorage<CompletedSteps>('srishti-routine-completed', {});
+  const [completedSteps, setCompletedSteps] = useSyncedStorage<CompletedSteps>('completedRoutines', {});
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Update time of day every minute

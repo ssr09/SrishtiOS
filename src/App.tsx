@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ThemeProvider } from './shared/contexts/ThemeContext';
 import { NavigationProvider, type AppRoute } from './shared/contexts/NavigationContext';
+import { FamilyProvider } from './shared/contexts/FamilyContext';
 import { HomePage } from './HomePage';
 import { DailyRoutine } from './apps/daily-routine/DailyRoutine';
 import { MagicTimer } from './apps/magic-timer/MagicTimer';
@@ -49,9 +50,11 @@ function App() {
 
   return (
     <ThemeProvider>
-      <NavigationProvider onNavigate={setCurrentRoute}>
-        {renderApp()}
-      </NavigationProvider>
+      <FamilyProvider>
+        <NavigationProvider onNavigate={setCurrentRoute}>
+          {renderApp()}
+        </NavigationProvider>
+      </FamilyProvider>
     </ThemeProvider>
   );
 }

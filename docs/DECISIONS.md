@@ -198,3 +198,68 @@ This document records significant technical decisions made during development.
 **Trade-offs**:
 - Voice quality varies by device/browser
 - Not available in all browsers (hook checks `isSupported`)
+
+---
+
+## 2024-12 Cross-Device Sync
+
+### Decision: Firebase Firestore for cross-device data sync
+
+**Context**: User wanted settings (archived apps, themes, custom foods, etc.) to persist across multiple devices (phone, tablet, laptop).
+
+**Options Considered**:
+1. Firebase Firestore - Real-time sync, free tier, no server needed
+2. Supabase - Open source alternative, requires more setup
+3. Export/Import JSON - Manual sync, no external service
+4. Vercel KV - Same hosting provider, but requires user ID
+
+**Decision**: Firebase Firestore with family code authentication.
+
+**Rationale**:
+- **Free tier sufficient**: 50K reads/day, 20K writes/day (family app uses ~100-500/day)
+- **Real-time listeners**: Built-in, changes sync instantly across devices
+- **Offline persistence**: Works without internet, syncs when back online
+- **No user accounts**: Simple 6-character family code instead of login
+- **No server code**: Client SDK only, no backend to maintain
+
+**Trade-offs**:
+- Google dependency (acceptable for convenience)
+- Security through obscurity (family code is like a password)
+- Firebase SDK adds to bundle size (~50KB)
+
+---
+
+### Decision: Family code instead of user authentication
+
+**Context**: Need to identify "family" across devices without complex login.
+
+**Decision**: Generate unique 6-character alphanumeric code, share between devices.
+
+**Rationale**:
+- No login friction for toddler app
+- Easy to share: "Enter this code on your other device"
+- Sufficiently secure for family-only app (36^6 = 2 billion combinations)
+- Code displayed in ParentPanel for easy access
+
+**Implementation**:
+- Code stored in `srishti-family-code` in localStorage
+- Firestore document path: `families/{familyCode}`
+- Characters exclude confusing ones (0/O, 1/I/l)
+
+---
+
+### Decision: useSyncedStorage hook pattern
+
+**Context**: Need to migrate from localStorage-only to cloud-synced storage while maintaining offline capability.
+
+**Decision**: Create `useSyncedStorage` hook that:
+1. Reads from Firestore when connected
+2. Falls back to localStorage when offline
+3. Writes to both Firestore and localStorage
+4. Uses same API as `useLocalStorage` for easy migration
+
+**Rationale**:
+- Minimal code changes needed in existing components
+- Graceful degradation when offline
+- Real-time updates via Firestore listeners
+- Backwards compatible with existing data
