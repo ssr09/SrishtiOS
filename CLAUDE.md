@@ -15,6 +15,20 @@ When making changes, ask yourself:
 2. Did I make a decision with trade-offs? → Add to DECISIONS.md
 3. Did I complete a goal or have a new idea? → Update GOALS.md
 
+## Responsive Design Requirements
+
+**IMPORTANT**: All layouts must work across mobile, tablet, and laptop screens.
+
+Before implementing any UI:
+1. Consider how it will look on phone (375px), tablet (768px), and desktop (1024px+)
+2. If the layout requires different approaches per screen size, ask the user for preferences
+3. If there are trade-offs (e.g., hiding elements on mobile, simplifying interactions), present options to the user
+
+Common patterns:
+- Use Tailwind responsive prefixes: `sm:`, `md:`, `lg:`, `xl:`
+- Mobile-first: start with mobile layout, enhance for larger screens
+- Test with browser dev tools responsive mode before committing
+
 ## Test-First Development
 
 **IMPORTANT**: For any significant feature requests, follow this workflow:
