@@ -1,0 +1,84 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+SrishtiOS is an interactive web application suite designed for toddlers (2.5 years old). It consists of 11 interconnected apps built with React 19, TypeScript, Vite, and Tailwind CSS. The project prioritizes toddler-friendly UX with large touch targets, colorful themes, and immediate visual feedback.
+
+## Commands
+
+```bash
+npm run dev      # Start Vite dev server (localhost:5173)
+npm run build    # TypeScript build + Vite production build
+npm run lint     # Run ESLint
+npm run preview  # Preview production build
+```
+
+## Architecture
+
+### Routing Pattern
+Simple state-based routing in `App.tsx` using a `currentRoute` state variable. No React Router - navigation is handled by updating state. Each app receives an `onNavigate` callback to return home.
+
+### State Management
+- **Global**: Theme state via React Context (`src/shared/contexts/ThemeContext.tsx`)
+- **Persistent**: `useLocalStorage` hook for user data, preferences, and progress
+- **Local**: Component state for UI interactions
+
+### Theme System
+Five themes defined in `src/shared/themes/themes.ts`. Themes are applied via CSS custom properties (defined in `index.css`) and switched using `data-theme` attribute on document element. Variables include `--theme-bg`, `--theme-primary`, `--theme-secondary`, `--theme-accent`, `--theme-text`.
+
+### App Structure Pattern
+Each app in `src/apps/` follows this pattern:
+- Main component file (e.g., `MagicTimer.tsx`)
+- Config file with defaults (e.g., `timerConfig.ts`)
+- Database file for static data (e.g., `foodDatabase.ts`)
+- Sub-components as needed
+
+### Shared Components
+- `BigButton`: Large touch-friendly button with emoji support and size variants (small, medium, large, xlarge)
+- `ParentPanel`: Settings modal with 5 tabs (Themes, Foods, Bath Toys, Timer Presets, Data Management) - accessed via 1.5s long-press on settings icon
+
+### Key Design Constraints
+- Minimum button size: 140px (large) to 180px (xlarge)
+- All interactions must have immediate visual feedback (Framer Motion animations)
+- No failure states - all actions result in positive confirmations
+- Offline-first: no external API calls, all data in localStorage
+- Target audience is non-literate - rely on emojis, colors, and animations
+- **Mobile/tablet first**: App must work seamlessly on touch devices
+  - No pinch-to-zoom (disabled via viewport meta)
+  - No pull-to-refresh or overscroll bounce
+  - No text selection or long-press context menus
+  - Use `touch-action: manipulation` for faster taps
+  - Support safe-area insets for notched devices
+  - Use dynamic viewport height (`100dvh`) for mobile browsers
+
+## File Organization
+
+```
+src/
+├── App.tsx              # Main router/state holder
+├── HomePage.tsx         # App launcher grid
+├── shared/              # Reusable logic
+│   ├── components/      # BigButton, ParentPanel
+│   ├── contexts/        # ThemeContext
+│   ├── hooks/           # useLocalStorage
+│   ├── themes/          # Theme definitions
+│   └── types/           # TypeScript interfaces
+└── apps/                # Individual app modules
+    ├── daily-routine/
+    ├── magic-timer/
+    ├── star-rewards/
+    ├── food-friends/
+    ├── bath-buddy/
+    ├── learning-games/
+    ├── creative/
+    └── stories/
+```
+
+## Adding a New App
+
+1. Create folder in `src/apps/` with main component and config files
+2. Add route case in `App.tsx` switch statement
+3. Add app button to `HomePage.tsx` grid with emoji and navigation callback
+4. Follow existing patterns: use BigButton for interactions, Framer Motion for animations, useLocalStorage for persistence
