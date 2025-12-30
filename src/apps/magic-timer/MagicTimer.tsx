@@ -171,18 +171,39 @@ export const MagicTimer: React.FC = () => {
         <AppHeader title="Magic Timer" emoji="⏳" />
       </div>
 
-      {/* Main Content - Three Column Layout */}
-      <div className="flex-1 flex items-stretch gap-3 px-3 pb-3 min-h-0">
+      {/* Main Content - Responsive Layout */}
+      <div className="flex-1 flex flex-col lg:flex-row gap-3 px-3 pb-3 min-h-0 overflow-hidden">
 
-        {/* Left Column: Particles (vertical, centered) */}
-        <div className="w-16 md:w-20 flex flex-col justify-center gap-2 bg-white bg-opacity-30 rounded-2xl p-2">
+        {/* Mobile: Particle selector as horizontal row at top */}
+        <div className="flex lg:hidden gap-2 justify-center flex-shrink-0">
           {particleTypes.map(type => (
             <motion.button
               key={type.id}
               whileTap={{ scale: 0.9 }}
               onClick={() => setParticleType(type.id)}
               className={`
-                aspect-square rounded-xl text-3xl md:text-4xl transition-all
+                w-12 h-12 rounded-xl text-2xl transition-all
+                flex items-center justify-center
+                ${particleType === type.id
+                  ? 'bg-theme-primary scale-110 shadow-lg'
+                  : 'bg-white shadow'
+                }
+              `}
+            >
+              {type.emoji}
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Desktop: Left Column - Particles (vertical) */}
+        <div className="hidden lg:flex w-20 flex-col justify-center gap-2 bg-white bg-opacity-30 rounded-2xl p-2">
+          {particleTypes.map(type => (
+            <motion.button
+              key={type.id}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setParticleType(type.id)}
+              className={`
+                aspect-square rounded-xl text-4xl transition-all
                 flex items-center justify-center
                 ${particleType === type.id
                   ? 'bg-theme-primary scale-105 shadow-lg'
@@ -196,13 +217,13 @@ export const MagicTimer: React.FC = () => {
         </div>
 
         {/* Center Column: Timer Display + Hourglass + Controls */}
-        <div className="flex-1 flex flex-col items-center justify-center bg-white bg-opacity-30 rounded-2xl p-2">
-          {/* Time Display - smaller, for adults */}
+        <div className="flex-1 flex flex-col items-center justify-center bg-white bg-opacity-30 rounded-2xl p-3 min-h-0">
+          {/* Time Display */}
           <motion.div
             key={timeRemaining}
             initial={{ scale: 1.02 }}
             animate={{ scale: 1 }}
-            className={`text-3xl md:text-4xl font-bold mb-1 tabular-nums ${getUrgencyClass()}`}
+            className={`text-4xl md:text-5xl font-bold mb-1 tabular-nums ${getUrgencyClass()}`}
           >
             {timerDisplay}
           </motion.div>
@@ -214,8 +235,8 @@ export const MagicTimer: React.FC = () => {
             </div>
           )}
 
-          {/* Hourglass Animation - bigger */}
-          <div className="flex-1 flex items-center justify-center min-h-0">
+          {/* Hourglass Animation */}
+          <div className="flex-1 flex items-center justify-center min-h-0 w-full max-w-xs">
             <HourglassAnimation
               progress={progress}
               particleType={particleType}
@@ -243,7 +264,7 @@ export const MagicTimer: React.FC = () => {
                 `}
               >
                 <span className="text-xl">{isPaused ? '▶️' : '⏸️'}</span>
-                {isPaused ? 'Go' : 'Pause'}
+                <span className="hidden sm:inline">{isPaused ? 'Go' : 'Pause'}</span>
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -252,7 +273,7 @@ export const MagicTimer: React.FC = () => {
                 className="flex-1 bg-blue-500 text-white py-3 rounded-2xl font-bold text-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-1 disabled:opacity-50"
               >
                 <span className="text-xl">🔄</span>
-                Reset
+                <span className="hidden sm:inline">Reset</span>
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -261,7 +282,7 @@ export const MagicTimer: React.FC = () => {
                 className="flex-1 bg-red-500 text-white py-3 rounded-2xl font-bold text-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-1 disabled:opacity-50"
               >
                 <span className="text-xl">⏹️</span>
-                Stop
+                <span className="hidden sm:inline">Stop</span>
               </motion.button>
             </div>
           )}
@@ -273,16 +294,15 @@ export const MagicTimer: React.FC = () => {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowCustomInput(true)}
-                  className="w-full bg-gray-600 text-white py-4 rounded-2xl font-bold text-xl hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-gray-600 text-white py-3 rounded-2xl font-bold text-lg hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
                 >
-                  <span className="text-2xl">⏱️</span> Custom Timer
+                  <span className="text-xl">⏱️</span> Custom
                 </motion.button>
               ) : (
                 <div className="bg-white rounded-2xl p-4 shadow-lg">
                   <div className="text-lg font-bold text-gray-700 mb-3">Enter time:</div>
                   <div className="flex gap-3">
                     <div className="flex-1 relative">
-                      {/* Hidden input for typing */}
                       <input
                         type="text"
                         inputMode="numeric"
@@ -292,14 +312,12 @@ export const MagicTimer: React.FC = () => {
                         className="absolute inset-0 opacity-0 cursor-text"
                         autoFocus
                       />
-                      {/* Visible masked display - fills from right like a calculator */}
                       <div className="px-4 py-4 rounded-xl border-2 border-gray-300 text-center text-3xl font-bold focus-within:border-theme-primary">
                         {(() => {
                           const padded = customMinutes.padStart(4, '0');
                           const mm = padded.slice(0, 2);
                           const ss = padded.slice(2, 4);
                           const n = customMinutes.length;
-                          // Digits fill from right: position 3,2,1,0 as user types
                           return (
                             <span>
                               <span className={n >= 4 ? 'text-gray-800' : 'text-gray-300'}>{mm[0]}</span>
@@ -332,8 +350,32 @@ export const MagicTimer: React.FC = () => {
           )}
         </div>
 
-        {/* Right Column: Timer Presets (vertical rectangles) */}
-        <div className="w-48 md:w-56 flex flex-col gap-2 bg-white bg-opacity-30 rounded-2xl p-2">
+        {/* Mobile: Presets as horizontal scrollable row at bottom */}
+        {!isRunning && !isPaused && (
+          <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 flex-shrink-0 snap-x snap-mandatory">
+            {timerPresets.map(preset => (
+              <motion.button
+                key={preset.id}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handlePresetClick(preset)}
+                className={`
+                  ${preset.color} text-white px-4 py-3 rounded-2xl font-bold
+                  transition-all flex-shrink-0 snap-start
+                  flex items-center gap-2 min-w-[140px]
+                `}
+              >
+                <span className="text-3xl">{preset.emoji}</span>
+                <div className="text-left">
+                  <div className="text-sm font-bold whitespace-nowrap">{preset.name}</div>
+                  <div className="text-xs opacity-90">{formatTime(preset.seconds)}</div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        )}
+
+        {/* Desktop: Right Column - Timer Presets (vertical) */}
+        <div className="hidden lg:flex w-56 flex-col gap-2 bg-white bg-opacity-30 rounded-2xl p-2">
           {timerPresets.map(preset => (
             <motion.button
               key={preset.id}
@@ -347,10 +389,10 @@ export const MagicTimer: React.FC = () => {
                 flex items-center gap-3
               `}
             >
-              <span className="text-4xl md:text-5xl">{preset.emoji}</span>
+              <span className="text-5xl">{preset.emoji}</span>
               <div className="text-left flex-1">
-                <div className="text-lg md:text-xl font-bold">{preset.name}</div>
-                <div className="text-base md:text-lg opacity-90">{formatTime(preset.seconds)}</div>
+                <div className="text-xl font-bold">{preset.name}</div>
+                <div className="text-lg opacity-90">{formatTime(preset.seconds)}</div>
               </div>
             </motion.button>
           ))}
