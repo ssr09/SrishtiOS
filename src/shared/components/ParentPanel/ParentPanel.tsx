@@ -5,15 +5,17 @@ import { FoodsTab } from './FoodsTab';
 import { ToysTab } from './ToysTab';
 import { TimersTab } from './TimersTab';
 import { DataTab } from './DataTab';
+import { AppsTab } from './AppsTab';
 
 interface ParentPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type Tab = 'theme' | 'foods' | 'toys' | 'timers' | 'data';
+type Tab = 'apps' | 'theme' | 'foods' | 'toys' | 'timers' | 'data';
 
 const tabs = [
+  { id: 'apps' as Tab, label: 'Apps', emoji: '📱' },
   { id: 'theme' as Tab, label: 'Themes', emoji: '🎨' },
   { id: 'foods' as Tab, label: 'Foods', emoji: '🍎' },
   { id: 'toys' as Tab, label: 'Bath Toys', emoji: '🛁' },
@@ -75,6 +77,7 @@ export const ParentPanel: React.FC<ParentPanelProps> = ({ isOpen, onClose }) => 
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-6">
           <AnimatePresence mode="wait">
+            {activeTab === 'apps' && <AppsTab />}
             {activeTab === 'theme' && <ThemeTab />}
             {activeTab === 'foods' && <FoodsTab />}
             {activeTab === 'toys' && <ToysTab />}

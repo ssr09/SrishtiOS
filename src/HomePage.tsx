@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { BigButton } from './shared/components/BigButton';
 import { ParentPanel } from './shared/components/ParentPanel';
 import { useNavigation, type AppRoute } from './shared/contexts/NavigationContext';
-import { motion } from 'framer-motion';
+import { useLocalStorage } from './shared/hooks/useLocalStorage';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const apps = [
+export const apps = [
   { id: 'routine', name: 'My Day', emoji: '🌞', color: 'bg-orange-400' },
   { id: 'timer', name: 'Timer', emoji: '⏳', color: 'bg-blue-400' },
   { id: 'stars', name: 'My Stars', emoji: '⭐', color: 'bg-yellow-400' },
@@ -22,6 +23,9 @@ export const HomePage: React.FC = () => {
   const { navigate } = useNavigation();
   const [showParentPanel, setShowParentPanel] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<number | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [archivedApps] = useLocalStorage<string[]>('srishti-archived-apps', []);
+  const [appLastUsed, setAppLastUsed] = useLocalStorage<Record<string, number>>('srishti-app-last-used', {});
 
   const handleSettingsPress = () => {
     const timer = window.setTimeout(() => {
@@ -38,8 +42,21 @@ export const HomePage: React.FC = () => {
   };
 
   const handleAppClick = (appId: string) => {
+    // Track last used time
+    setAppLastUsed({ ...appLastUsed, [appId]: Date.now() });
     navigate(appId as AppRoute);
   };
+
+  // Filter apps into active and archived
+  const activeApps = apps.filter(app => !archivedApps.includes(app.id));
+  const archivedAppsList = apps
+    .filter(app => archivedApps.includes(app.id))
+    .sort((a, b) => {
+      // Sort by last used (most recent first), fallback to 0 for never-used apps
+      const aTime = appLastUsed[a.id] || 0;
+      const bTime = appLastUsed[b.id] || 0;
+      return bTime - aTime;
+    });
 
   return (
     <div className="min-h-screen bg-theme-bg p-4 pb-24 md:p-8 md:pb-8 overflow-y-auto">
@@ -67,14 +84,14 @@ export const HomePage: React.FC = () => {
         </motion.button>
       </header>
 
-      {/* App Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
-        {apps.map((app, index) => (
+      {/* App Grid - Active Apps */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 max-w-7xl mx-auto">
+        {activeApps.map((app, index) => (
           <motion.div
             key={app.id}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1 }}
+            transition={{ delay: index * 0.05 }}
           >
             <BigButton
               emoji={app.emoji}
@@ -87,6 +104,51 @@ export const HomePage: React.FC = () => {
           </motion.div>
         ))}
       </div>
+
+      {/* Archived Apps Section */}
+      {archivedAppsList.length > 0 && (
+        <div className="mt-8 max-w-7xl mx-auto">
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className="flex items-center gap-2 text-theme-text-secondary hover:text-theme-text transition-colors mb-4"
+          >
+            <span className="text-2xl">{showArchived ? '📂' : '📁'}</span>
+            <span className="text-lg font-semibold">More Apps ({archivedAppsList.length})</span>
+            <span className="text-xl">{showArchived ? '▼' : '▶'}</span>
+          </button>
+
+          <AnimatePresence>
+            {showArchived && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                data-testid="archived-apps"
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 overflow-hidden"
+              >
+                {archivedAppsList.map((app, index) => (
+                  <motion.div
+                    key={app.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <BigButton
+                      emoji={app.emoji}
+                      onClick={() => handleAppClick(app.id)}
+                      color={app.color}
+                      size="large"
+                      className="opacity-75 hover:opacity-100"
+                    >
+                      {app.name}
+                    </BigButton>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* Parent Panel */}
       <ParentPanel

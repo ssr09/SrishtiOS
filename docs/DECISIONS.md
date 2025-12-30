@@ -164,6 +164,25 @@ This document records significant technical decisions made during development.
 
 ---
 
+### Decision: App archiving with collapsible section
+
+**Context**: As Srishti grows, some apps may become less relevant but user wants to keep them accessible for nostalgia.
+
+**Decision**: Archive apps to a collapsible "More Apps" section on HomePage, managed via ParentPanel.
+
+**Rationale**:
+- Hidden from main view but still easily accessible
+- No data loss - just visibility toggle
+- Sorted by last-used (most recent first) for easy finding
+- Parent-controlled via Apps tab in settings
+
+**Implementation**:
+- `srishti-archived-apps`: Array of archived app IDs in localStorage
+- `srishti-app-last-used`: Timestamp tracking for sorting
+- Collapsible section with folder icon
+
+---
+
 ### Decision: Web Speech API for voice
 
 **Context**: Learning games should speak words aloud.
