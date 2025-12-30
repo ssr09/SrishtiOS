@@ -84,8 +84,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* Prevent overscroll bounce */
-  overscroll-behavior: none;
+  overflow-y: auto;
+  /* Prevent overscroll bounce but allow normal scroll */
+  overscroll-behavior-x: none;
   /* Prevent text selection globally for toddler app */
   user-select: none;
   -webkit-user-select: none;

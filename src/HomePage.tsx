@@ -42,7 +42,7 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-theme-bg p-4 md:p-8">
+    <div className="min-h-screen bg-theme-bg p-4 pb-24 md:p-8 md:pb-8 overflow-y-auto">
       {/* Header */}
       <header className="mb-8 flex items-center justify-between">
         <motion.h1
