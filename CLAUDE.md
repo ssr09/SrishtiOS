@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Documentation Maintenance
+
+**IMPORTANT**: Keep the `docs/` folder up to date as you work:
+
+- **`docs/ARCHITECTURE.md`** - Update when adding new components, hooks, contexts, or changing the project structure
+- **`docs/DECISIONS.md`** - Add entries when making significant technical decisions (new libraries, patterns, trade-offs)
+- **`docs/GOALS.md`** - Update when completing features, adding new ideas, or changing project direction
+
+When making changes, ask yourself:
+1. Did I add a new pattern or component? → Update ARCHITECTURE.md
+2. Did I make a decision with trade-offs? → Add to DECISIONS.md
+3. Did I complete a goal or have a new idea? → Update GOALS.md
+
 ## Project Overview
 
 SrishtiOS is an interactive web application suite designed for toddlers (2.5 years old). It consists of 11 interconnected apps built with React 19, TypeScript, Vite, and Tailwind CSS. The project prioritizes toddler-friendly UX with large touch targets, colorful themes, and immediate visual feedback.
