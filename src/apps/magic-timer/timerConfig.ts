@@ -11,8 +11,8 @@ export interface TimerPreset {
 export const timerPresets: TimerPreset[] = [
   { id: 'quick-task', name: 'Quick Task', emoji: '⚡', seconds: 60, color: 'bg-yellow-500' },
   { id: 'brush-teeth', name: 'Brush Teeth', emoji: '🪥', seconds: 120, color: 'bg-blue-400' },
-  { id: 'snack-wait', name: 'Wait for Snack', emoji: '🍎', seconds: 300, color: 'bg-red-400' },
-  { id: 'quiet-time', name: 'Quiet Time', emoji: '📚', seconds: 900, color: 'bg-purple-400' },
+  { id: 'get-ready', name: 'Get Ready', emoji: '👗', seconds: 300, color: 'bg-pink-400' },
+  { id: 'take-bath', name: 'Take a Bath', emoji: '🛁', seconds: 600, color: 'bg-cyan-400' },
 ];
 
 export const particleTypes: { id: ParticleType; emoji: string; label: string }[] = [
