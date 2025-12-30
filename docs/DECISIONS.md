@@ -131,6 +131,25 @@ This document records significant technical decisions made during development.
 
 ---
 
+### Decision: Browser history integration for mobile back button
+
+**Context**: Back button on mobile browsers didn't work - it would exit the app instead of navigating back.
+
+**Decision**: Integrate browser history API with NavigationContext using URL hashes.
+
+**Rationale**:
+- Mobile users expect back button to work within apps
+- URL hashes (`#colors`, `#timer`) enable deep linking
+- No additional dependencies needed
+- Works with existing state-based routing
+
+**Implementation**:
+- `history.pushState()` on navigation
+- `popstate` event listener for back/forward
+- URL hash parsed on initial load for deep linking
+
+---
+
 ### Decision: Vitest over Jest for testing
 
 **Context**: Need testing framework for React components.

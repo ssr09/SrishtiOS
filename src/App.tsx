@@ -43,7 +43,7 @@ function App() {
         return <StoryTime />;
       case 'home':
       default:
-        return <HomePage onNavigate={(route) => setCurrentRoute(route as AppRoute)} />;
+        return <HomePage />;
     }
   };
 

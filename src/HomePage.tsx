@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
 import { BigButton } from './shared/components/BigButton';
 import { ParentPanel } from './shared/components/ParentPanel';
+import { useNavigation, type AppRoute } from './shared/contexts/NavigationContext';
 import { motion } from 'framer-motion';
 
 const apps = [
-  { id: 'routine', name: 'My Day', emoji: '🌞', path: '/routine', color: 'bg-orange-400' },
-  { id: 'timer', name: 'Timer', emoji: '⏳', path: '/timer', color: 'bg-blue-400' },
-  { id: 'stars', name: 'My Stars', emoji: '⭐', path: '/stars', color: 'bg-yellow-400' },
-  { id: 'food', name: 'Food Time', emoji: '🍎', path: '/food', color: 'bg-green-400' },
-  { id: 'bath', name: 'Bath Time', emoji: '🛁', path: '/bath', color: 'bg-cyan-400' },
-  { id: 'colors', name: 'Colors', emoji: '🎨', path: '/colors', color: 'bg-pink-400' },
-  { id: 'shapes', name: 'Shapes', emoji: '🔷', path: '/shapes', color: 'bg-purple-400' },
-  { id: 'counting', name: 'Counting', emoji: '🔢', path: '/counting', color: 'bg-indigo-400' },
-  { id: 'animals', name: 'Animals', emoji: '🦁', path: '/animals', color: 'bg-amber-400' },
-  { id: 'draw', name: 'Draw', emoji: '✏️', path: '/draw', color: 'bg-rose-400' },
-  { id: 'stories', name: 'Stories', emoji: '📖', path: '/stories', color: 'bg-teal-400' },
+  { id: 'routine', name: 'My Day', emoji: '🌞', color: 'bg-orange-400' },
+  { id: 'timer', name: 'Timer', emoji: '⏳', color: 'bg-blue-400' },
+  { id: 'stars', name: 'My Stars', emoji: '⭐', color: 'bg-yellow-400' },
+  { id: 'food', name: 'Food Time', emoji: '🍎', color: 'bg-green-400' },
+  { id: 'bath', name: 'Bath Time', emoji: '🛁', color: 'bg-cyan-400' },
+  { id: 'colors', name: 'Colors', emoji: '🎨', color: 'bg-pink-400' },
+  { id: 'shapes', name: 'Shapes', emoji: '🔷', color: 'bg-purple-400' },
+  { id: 'counting', name: 'Counting', emoji: '🔢', color: 'bg-indigo-400' },
+  { id: 'animals', name: 'Animals', emoji: '🦁', color: 'bg-amber-400' },
+  { id: 'draw', name: 'Draw', emoji: '✏️', color: 'bg-rose-400' },
+  { id: 'stories', name: 'Stories', emoji: '📖', color: 'bg-teal-400' },
 ];
 
-interface HomePageProps {
-  onNavigate: (route: string) => void;
-}
-
-export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
+export const HomePage: React.FC = () => {
+  const { navigate } = useNavigation();
   const [showParentPanel, setShowParentPanel] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<number | null>(null);
 
@@ -40,8 +38,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   };
 
   const handleAppClick = (appId: string) => {
-    // Navigate to all available apps
-    onNavigate(appId as any);
+    navigate(appId as AppRoute);
   };
 
   return (
