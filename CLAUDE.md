@@ -15,6 +15,26 @@ When making changes, ask yourself:
 2. Did I make a decision with trade-offs? → Add to DECISIONS.md
 3. Did I complete a goal or have a new idea? → Update GOALS.md
 
+## Test-First Development
+
+**IMPORTANT**: For any significant feature requests, follow this workflow:
+
+1. **Clarify first** - If there's any ambiguity about requirements, ask the user before writing code
+2. **Write tests first** - Create tests that define the expected behavior
+3. **Implement after** - Write the implementation to make tests pass
+4. **Verify** - Run `npm run build && npm run test:run` to confirm everything works
+
+This ensures:
+- Requirements are understood before coding
+- Expected behavior is documented in tests
+- Regressions are caught early
+- Code is testable by design
+
+Tests go in `__tests__/` directories adjacent to the code they test:
+- `src/shared/components/__tests__/`
+- `src/shared/hooks/__tests__/`
+- `src/apps/[app-name]/__tests__/`
+
 ## Project Overview
 
 SrishtiOS is an interactive web application suite designed for toddlers (2.5 years old). It consists of 11 interconnected apps built with React 19, TypeScript, Vite, and Tailwind CSS. The project prioritizes toddler-friendly UX with large touch targets, colorful themes, and immediate visual feedback.
