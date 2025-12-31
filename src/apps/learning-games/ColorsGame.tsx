@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
 import { useGameRound } from '../../shared/hooks/useGameRound';
@@ -32,7 +32,16 @@ export const ColorsGame: React.FC = () => {
   });
   const [showCelebration, setShowCelebration] = useState(false);
   const [score, setScore] = useState(0);
-  const { speak } = useVoice();
+  const { speak, stop } = useVoice();
+  const timeoutsRef = useRef<number[]>([]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach(t => clearTimeout(t));
+      stop();
+    };
+  }, [stop]);
 
   useEffect(() => {
     generateRound();
@@ -45,16 +54,18 @@ export const ColorsGame: React.FC = () => {
       setScore(score + 1);
       speak(`Good job! That's ${color.name}!`);
 
-      setTimeout(() => {
+      const t = window.setTimeout(() => {
         setShowCelebration(false);
         generateRound();
       }, 2000);
+      timeoutsRef.current.push(t);
     } else {
       // Name what they picked, pause, then guide to correct answer
       speak(`That's ${color.name}...`);
-      setTimeout(() => {
+      const t = window.setTimeout(() => {
         speak(`Can you find ${targetColor.name}?`);
       }, 1200);
+      timeoutsRef.current.push(t);
     }
   };
 
@@ -78,18 +89,20 @@ export const ColorsGame: React.FC = () => {
         <span className="text-2xl"> ⭐</span>
       </div>
 
-      {/* Prompt */}
-      <motion.div
+      {/* Prompt - tap to repeat question */}
+      <motion.button
         key={targetColor.name}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-3xl p-6 shadow-2xl mx-auto text-center"
+        whileTap={{ scale: 0.95 }}
+        onClick={() => speak(`Can you find ${targetColor.name}?`)}
+        className="bg-white rounded-3xl p-6 shadow-2xl mx-auto text-center cursor-pointer hover:shadow-3xl transition-shadow"
       >
         <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: targetColor.hex }}>
           Can you find {targetColor.name}?
         </h2>
         <div className="text-7xl md:text-8xl">{targetColor.emoji}</div>
-      </motion.div>
+      </motion.button>
 
       {/* Color Options */}
       <div className="flex-1 flex items-center justify-center">
@@ -102,8 +115,9 @@ export const ColorsGame: React.FC = () => {
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => handleColorClick(color)}
-              className="w-32 h-32 md:w-40 md:h-40 rounded-3xl shadow-2xl hover:shadow-3xl transition-all border-4 border-white flex items-center justify-center"
+              onClick={() => !showCelebration && handleColorClick(color)}
+              disabled={showCelebration}
+              className={`w-32 h-32 md:w-40 md:h-40 rounded-3xl shadow-2xl hover:shadow-3xl transition-all border-4 border-white flex items-center justify-center ${showCelebration ? 'pointer-events-none' : ''}`}
               style={{ backgroundColor: color.hex }}
             >
               <motion.div

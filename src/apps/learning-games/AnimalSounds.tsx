@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
 import { AppHeader } from '../../shared/components/AppHeader';
@@ -44,7 +44,25 @@ const animals: Animal[] = [
 export const AnimalSounds: React.FC = () => {
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   const { speak, stop } = useVoice();
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Stop any playing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      // Clear any pending timeouts
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // Stop speech synthesis
+      stop();
+    };
+  }, [stop]);
 
   const playSound = (animal: Animal) => {
     // Stop any currently playing sound
@@ -76,9 +94,14 @@ export const AnimalSounds: React.FC = () => {
     setSelectedAnimal(animal);
     stop();
 
+    // Clear any pending timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     // First speak the animal name, then play the sound
     speak(animal.name, { rate: 0.9 });
-    setTimeout(() => playSound(animal), 800);
+    timeoutRef.current = window.setTimeout(() => playSound(animal), 800);
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
 import { useGameRound } from '../../shared/hooks/useGameRound';
@@ -115,7 +115,16 @@ export const ShapesGame: React.FC = () => {
   const [shapeColor, setShapeColor] = useState(colors[0]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [score, setScore] = useState(0);
-  const { speak } = useVoice();
+  const { speak, stop } = useVoice();
+  const timeoutsRef = useRef<number[]>([]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach(t => clearTimeout(t));
+      stop();
+    };
+  }, [stop]);
 
   const generateRound = () => {
     generateShapeRound();
@@ -134,16 +143,18 @@ export const ShapesGame: React.FC = () => {
       setScore(score + 1);
       speak(`Good job! That's a ${shape.name}!`);
 
-      setTimeout(() => {
+      const t = window.setTimeout(() => {
         setShowCelebration(false);
         generateRound();
       }, 2000);
+      timeoutsRef.current.push(t);
     } else {
       // Name what they picked, pause, then guide to correct answer
       speak(`That's a ${shape.name}...`);
-      setTimeout(() => {
+      const t = window.setTimeout(() => {
         speak(`Can you find the ${targetShape.name}?`);
       }, 1200);
+      timeoutsRef.current.push(t);
     }
   };
 
@@ -167,12 +178,14 @@ export const ShapesGame: React.FC = () => {
         <span className="text-2xl"> ⭐</span>
       </div>
 
-      {/* Prompt */}
-      <motion.div
+      {/* Prompt - tap to repeat question */}
+      <motion.button
         key={targetShape.name}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-3xl p-6 shadow-2xl mx-auto text-center"
+        whileTap={{ scale: 0.95 }}
+        onClick={() => speak(`Can you find the ${targetShape.name}?`)}
+        className="bg-white rounded-3xl p-6 shadow-2xl mx-auto text-center cursor-pointer hover:shadow-3xl transition-shadow"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
           Can you find the {targetShape.name}?
@@ -180,7 +193,7 @@ export const ShapesGame: React.FC = () => {
         <svg viewBox="0 0 200 200" className="w-28 h-28 md:w-36 md:h-36 mx-auto" style={{ color: shapeColor }}>
           {targetShape.svg}
         </svg>
-      </motion.div>
+      </motion.button>
 
       {/* Shape Options */}
       <div className="flex-1 flex items-center justify-center">
@@ -193,8 +206,9 @@ export const ShapesGame: React.FC = () => {
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => handleShapeClick(shape)}
-              className="w-36 h-36 md:w-44 md:h-44 bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all p-4 flex flex-col items-center justify-center"
+              onClick={() => !showCelebration && handleShapeClick(shape)}
+              disabled={showCelebration}
+              className={`w-36 h-36 md:w-44 md:h-44 bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all p-4 flex flex-col items-center justify-center ${showCelebration ? 'pointer-events-none' : ''}`}
             >
               <svg viewBox="0 0 200 200" className="w-full h-3/4" style={{ color: shapeColor }}>
                 {shape.svg}
