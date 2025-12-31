@@ -19,8 +19,8 @@ This document records significant technical decisions made during development.
 - Smaller bundle size
 
 **Trade-offs**:
-- No browser back button support (acceptable for this use case)
-- No deep linking (not needed)
+- ~~No browser back button support~~ (later added via NavigationContext)
+- ~~No deep linking~~ (later added via URL hashes)
 
 ---
 
@@ -51,8 +51,9 @@ This document records significant technical decisions made during development.
 - Data stays on device (privacy for child data)
 
 **Trade-offs**:
-- No cross-device sync (acceptable, each device is independent)
-- Data can be cleared by browser (mitigated by export/import in ParentPanel)
+- Data can be cleared by browser (mitigated by cloud sync)
+
+**Update**: Cross-device sync was later added via Firebase Firestore (see "Cross-Device Sync" section below).
 
 ---
 

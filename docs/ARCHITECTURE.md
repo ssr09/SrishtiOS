@@ -38,13 +38,17 @@ src/
 │   │   ├── SelectableCard.tsx
 │   │   └── ParentPanel/    # Settings panel (split into tabs)
 │   ├── contexts/
-│   │   ├── ThemeContext.tsx
-│   │   └── NavigationContext.tsx
+│   │   ├── ThemeContext.tsx       # Global theme management
+│   │   ├── NavigationContext.tsx  # App routing with browser history
+│   │   └── FamilyContext.tsx      # Cloud sync with family codes
 │   ├── hooks/
-│   │   ├── useLocalStorage.ts
-│   │   ├── useVoice.ts
-│   │   ├── useGameRound.ts
-│   │   └── usePrint.ts
+│   │   ├── useLocalStorage.ts     # Simple localStorage wrapper
+│   │   ├── useSyncedStorage.ts    # localStorage + Firestore sync
+│   │   ├── useVoice.ts            # Text-to-speech wrapper
+│   │   ├── useGameRound.ts        # Game logic helper
+│   │   └── usePrint.ts            # Print functionality
+│   ├── firebase/
+│   │   └── config.ts              # Firebase initialization
 │   ├── themes/
 │   │   └── themes.ts
 │   └── types/
@@ -117,7 +121,8 @@ CSS custom properties switched via `data-theme` attribute:
 
 | Hook | Purpose |
 |------|---------|
-| `useLocalStorage<T>` | Persistent state with JSON serialization |
+| `useLocalStorage<T>` | Persistent state with JSON serialization (device-only) |
+| `useSyncedStorage<T>` | Persistent state synced to localStorage + Firestore |
 | `useVoice` | Text-to-speech with preferred voice selection |
 | `useGameRound<T>` | Game logic for learning games (target + options) |
 | `usePrint` | Print functionality for selection lists |

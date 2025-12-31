@@ -1,129 +1,125 @@
-# SrishtiOS 🏠
+# SrishtiOS
 
 A suite of interactive web apps designed for Srishti (2.5 years old) to make her day more exciting, fun, and organized!
 
-## 🎨 Features Built So Far
+**Live Demo**: [https://srishti-os.vercel.app](https://srishti-os.vercel.app)
 
-### Phase 1: Foundation ✅
-- ✅ Vite + React + TypeScript project setup
-- ✅ Tailwind CSS with custom theme system
-- ✅ 5 Beautiful themes (Sunshine ☀️, Ocean 🌊, Garden 🌻, Rainbow 🌈, Twilight 🌙)
-- ✅ Theme persistence in LocalStorage
-- ✅ **Srishti's Home** - Main launcher with large, colorful app icons
-- ✅ Parent Panel with theme selector (access via long-press on settings ⚙️)
-- ✅ Toddler-friendly UI with extra-large touch targets (80px minimum)
+## Apps
 
-## 🚀 Getting Started
+| App | Description |
+|-----|-------------|
+| **My Day** | Morning, afternoon, and evening routine tracker with checkmarks |
+| **Magic Timer** | Visual countdown with hourglass animation and particle effects |
+| **My Stars** | Star collection with milestone celebrations |
+| **Food Time** | Meal food selection with print functionality |
+| **Bath Time** | Bath toy selection by category |
+| **Colors** | Color recognition game with voice prompts |
+| **Shapes** | Shape identification game |
+| **Counting** | Number learning (1-10) with visual counting |
+| **Animals** | Animal recognition with sounds |
+| **Draw** | Free drawing canvas with colors and music |
+| **Stories** | Interactive story reader with narration |
 
-### Installation
+## Features
+
+- **Toddler-Friendly UI**: Extra-large touch targets (140-180px buttons), high contrast colors
+- **5 Themes**: Sunshine, Ocean, Garden, Rainbow, Twilight
+- **Voice Feedback**: Text-to-speech for learning games
+- **Cross-Device Sync**: Optional Firebase sync via family codes
+- **Offline Support**: Works without internet after initial load
+- **Parent Controls**: Long-press settings icon (1.5s) to access ParentPanel
+
+## Getting Started
+
 ```bash
+# Install dependencies
 npm install
-```
 
-### Development
-```bash
+# Start development server
 npm run dev
-```
 
-Visit [http://localhost:5173](http://localhost:5173) to see the app!
+# Run tests
+npm run test
 
-### Build for Production
-```bash
+# Build for production
 npm run build
 ```
 
-## 🎯 Planned Apps (Coming Soon!)
+Visit [http://localhost:5173](http://localhost:5173) to see the app.
 
-### Tier 1 - Daily Essentials
-1. **Daily Routine Helper** 🌞 - Full day routine tracker
-2. **Magic Hourglass Timer** ⏳ - Visual time understanding
-3. **Star Reward Chart** ⭐ - Achievement tracking
+## Parent Panel
 
-### Tier 2 - Engagement & Choice
-4. **Food Friends Chooser** 🍎 - Interactive food menu
-5. **Bath Time Buddy Selector** 🛁 - Choose bath toys
+Access by **long-pressing** (1.5 seconds) on the settings icon.
 
-### Tier 3 - Learning Games
-6. **Colors Game** 🎨 - Color recognition
-7. **Shapes Game** 🔷 - Shape matching
-8. **Counting Game** 🔢 - Count objects (1-10)
-9. **Animal Sounds** 🦁 - Learn animal names and sounds
+| Tab | Features |
+|-----|----------|
+| **Apps** | Show/hide apps from home screen |
+| **Themes** | Switch between 5 color themes |
+| **Foods** | Add, edit, delete food items |
+| **Bath Toys** | Add, edit, delete bath toys |
+| **Timers** | Customize timer presets |
+| **Data** | Cloud sync, reset, clear data |
 
-### Tier 4 - Creative & Stories
-10. **Creative Canvas** ✏️ - Drawing board + music maker
-11. **Story Time Companion** 📖 - Interactive storytelling
+## Cross-Device Sync
 
-## 🎨 Theme System
+Enable cloud sync in ParentPanel > Data to share settings across devices:
 
-Parents can switch between themes in the Parent Panel (long-press ⚙️ icon):
+1. Tap "Enable Sync" to generate a 6-character family code
+2. On another device, enter the code to connect
+3. All settings sync automatically in real-time
 
-- **Sunshine** ☀️ - Warm yellows and oranges (default)
-- **Ocean** 🌊 - Calming blues and teals
-- **Garden** 🌻 - Nature-inspired greens and purples
-- **Rainbow** 🌈 - Vibrant multi-colors
-- **Twilight** 🌙 - Soft purples and pinks
+Works offline - changes sync when back online.
 
-## 🔒 Parent Panel
+## Tech Stack
 
-Access by **long-pressing** (1.5 seconds) on the ⚙️ settings icon.
+| Layer | Technology |
+|-------|------------|
+| Framework | React 19 + TypeScript |
+| Styling | Tailwind CSS |
+| Build | Vite |
+| Animations | Framer Motion |
+| Backend | Firebase Firestore (optional) |
+| Testing | Vitest + React Testing Library |
+| Hosting | Vercel |
 
-Current features:
-- Theme selector
-
-Coming soon:
-- Food manager
-- Toy manager
-- Timer presets
-- Routine editor
-- Sound settings
-
-## 📱 Design Principles
-
-1. **Extra Large Touch Targets** - Minimum 80px for toddler fingers
-2. **High Contrast Colors** - Bright, saturated colors for visibility
-3. **Immediate Feedback** - Every interaction has visual/audio response
-4. **No Failure States** - Positive reinforcement only
-5. **Simple Navigation** - Home button always visible
-6. **Offline First** - Everything works without internet
-7. **Keep It Simple** - Each app does one thing well
-
-## 🛠️ Tech Stack
-
-- **Framework**: React 18 with TypeScript
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vite
-- **Animations**: Framer Motion
-- **State**: React Context + LocalStorage
-- **Routing**: React Router (coming soon)
-- **PWA**: Service Workers (coming soon)
-
-## 📂 Project Structure
+## Project Structure
 
 ```
-SrishtiOS/
-├── src/
-│   ├── HomePage.tsx              # Main launcher
-│   ├── shared/
-│   │   ├── components/          # Reusable UI components
-│   │   ├── contexts/            # React contexts (Theme, etc.)
-│   │   ├── hooks/               # Custom hooks
-│   │   ├── themes/              # Theme definitions
-│   │   ├── types/               # TypeScript types
-│   │   └── utils/               # Helper functions
-│   ├── apps/                    # Individual apps (coming soon)
-│   ├── App.tsx
-│   └── main.tsx
-├── PLAN.md                      # Detailed implementation plan
-└── README.md
+src/
+├── App.tsx                    # Main router
+├── HomePage.tsx               # App launcher grid
+├── shared/
+│   ├── components/            # BigButton, AppHeader, ParentPanel, etc.
+│   ├── contexts/              # Theme, Navigation, Family contexts
+│   ├── hooks/                 # useLocalStorage, useSyncedStorage, useVoice, etc.
+│   ├── firebase/              # Firebase configuration
+│   └── themes/                # Theme definitions
+└── apps/                      # Individual app modules
+    ├── daily-routine/
+    ├── magic-timer/
+    ├── star-rewards/
+    ├── food-friends/
+    ├── bath-buddy/
+    ├── learning-games/
+    ├── creative/
+    └── stories/
 ```
 
-## 🎉 Next Steps
+## Design Principles
 
-Building Tier 1 apps next:
-1. Daily Routine Helper
-2. Magic Hourglass Timer
-3. Star Reward Chart
+1. **Large Touch Targets** - Minimum 140px buttons for toddler fingers
+2. **Immediate Feedback** - Every interaction has visual/audio response
+3. **No Failure States** - Positive reinforcement only
+4. **Visual Over Text** - Emojis and colors for non-literate users
+5. **Offline First** - Works without internet
+6. **Mobile First** - Touch-optimized, responsive design
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) - Technical overview and patterns
+- [Decisions](docs/DECISIONS.md) - Key technical decisions and trade-offs
+- [Goals](docs/GOALS.md) - Project goals and future ideas
 
 ---
 
-Made with ❤️ for Srishti
+Made with love for Srishti

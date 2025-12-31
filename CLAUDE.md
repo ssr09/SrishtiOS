@@ -56,21 +56,30 @@ SrishtiOS is an interactive web application suite designed for toddlers (2.5 yea
 ## Commands
 
 ```bash
-npm run dev      # Start Vite dev server (localhost:5173)
-npm run build    # TypeScript build + Vite production build
-npm run lint     # Run ESLint
-npm run preview  # Preview production build
+npm run dev       # Start Vite dev server (localhost:5173)
+npm run build     # TypeScript build + Vite production build
+npm run lint      # Run ESLint
+npm run preview   # Preview production build
+npm run test      # Run Vitest in watch mode
+npm run test:run  # Run Vitest once (for CI)
 ```
 
 ## Architecture
 
 ### Routing Pattern
-Simple state-based routing in `App.tsx` using a `currentRoute` state variable. No React Router - navigation is handled by updating state. Each app receives an `onNavigate` callback to return home.
+Simple state-based routing in `App.tsx` using a `currentRoute` state variable. No React Router - navigation is handled via `NavigationContext`. Apps use the `useNavigation()` hook to access `navigate()` and `goHome()` functions. URL hashes (`#timer`, `#colors`) support browser back/forward buttons and deep linking.
 
 ### State Management
-- **Global**: Theme state via React Context (`src/shared/contexts/ThemeContext.tsx`)
-- **Persistent**: `useLocalStorage` hook for user data, preferences, and progress
+- **Global**: React Contexts for Theme, Navigation, and Family (cloud sync)
+- **Persistent (local only)**: `useLocalStorage` hook for device-specific data
+- **Persistent (cloud-synced)**: `useSyncedStorage` hook for cross-device data (foods, toys, timers, archived apps)
 - **Local**: Component state for UI interactions
+
+### Cloud Sync (Optional)
+Firebase Firestore enables cross-device sync via 6-character family codes. When enabled, `useSyncedStorage` writes to both localStorage and Firestore. Key files:
+- `src/shared/firebase/config.ts` - Firebase initialization
+- `src/shared/contexts/FamilyContext.tsx` - Family code management
+- `src/shared/hooks/useSyncedStorage.ts` - Synced storage hook
 
 ### Theme System
 Five themes defined in `src/shared/themes/themes.ts`. Themes are applied via CSS custom properties (defined in `index.css`) and switched using `data-theme` attribute on document element. Variables include `--theme-bg`, `--theme-primary`, `--theme-secondary`, `--theme-accent`, `--theme-text`.
@@ -84,7 +93,17 @@ Each app in `src/apps/` follows this pattern:
 
 ### Shared Components
 - `BigButton`: Large touch-friendly button with emoji support and size variants (small, medium, large, xlarge)
-- `ParentPanel`: Settings modal with 5 tabs (Themes, Foods, Bath Toys, Timer Presets, Data Management) - accessed via 1.5s long-press on settings icon
+- `AppHeader`: Header with title, emoji, and home button using NavigationContext
+- `CelebrationModal`: Full-screen celebration overlay for positive feedback
+- `SelectableCard`: Card with selection state and voice feedback (speaks name on tap)
+- `ParentPanel`: Settings modal with 6 tabs (Apps, Themes, Foods, Bath Toys, Timers, Data) - accessed via 1.5s long-press on settings icon
+
+### Shared Hooks
+- `useLocalStorage<T>`: Persistent state in localStorage (device-only)
+- `useSyncedStorage<T>`: Persistent state synced to localStorage + Firebase
+- `useVoice`: Text-to-speech wrapper (Web Speech API, prefers "Samantha" voice)
+- `useGameRound<T>`: Game logic for learning games (generates target + shuffled options)
+- `usePrint`: Opens print preview for selection lists (used by Food/Bath apps)
 
 ### Key Design Constraints
 - Minimum button size: 140px (large) to 180px (xlarge)
@@ -104,28 +123,39 @@ Each app in `src/apps/` follows this pattern:
 
 ```
 src/
-├── App.tsx              # Main router/state holder
-├── HomePage.tsx         # App launcher grid
-├── shared/              # Reusable logic
-│   ├── components/      # BigButton, ParentPanel
-│   ├── contexts/        # ThemeContext
-│   ├── hooks/           # useLocalStorage
-│   ├── themes/          # Theme definitions
-│   └── types/           # TypeScript interfaces
-└── apps/                # Individual app modules
-    ├── daily-routine/
-    ├── magic-timer/
-    ├── star-rewards/
-    ├── food-friends/
-    ├── bath-buddy/
-    ├── learning-games/
-    ├── creative/
-    └── stories/
+├── App.tsx                    # Main router/state holder
+├── HomePage.tsx               # App launcher grid
+├── HomePage.test.tsx          # Homepage tests
+├── shared/                    # Reusable logic
+│   ├── components/            # BigButton, AppHeader, CelebrationModal, SelectableCard
+│   │   └── ParentPanel/       # Settings modal split into 6 tab components
+│   ├── contexts/              # ThemeContext, NavigationContext, FamilyContext
+│   ├── hooks/                 # useLocalStorage, useSyncedStorage, useVoice, useGameRound, usePrint
+│   ├── firebase/              # Firebase config and Firestore setup
+│   ├── themes/                # Theme definitions (5 themes)
+│   └── types/                 # TypeScript interfaces
+├── apps/                      # Individual app modules
+│   ├── daily-routine/         # Morning/afternoon/evening routines
+│   ├── magic-timer/           # Visual countdown with hourglass animation
+│   ├── star-rewards/          # Star collection and milestones
+│   ├── food-friends/          # Food selection by meal time
+│   ├── bath-buddy/            # Bath toy selection by category
+│   ├── learning-games/        # Colors, Shapes, Counting, Animal Sounds games
+│   ├── creative/              # Drawing canvas with music
+│   └── stories/               # Interactive story reader
+└── test/
+    └── setup.ts               # Vitest setup with mocks
 ```
 
 ## Adding a New App
 
 1. Create folder in `src/apps/` with main component and config files
 2. Add route case in `App.tsx` switch statement
-3. Add app button to `HomePage.tsx` grid with emoji and navigation callback
-4. Follow existing patterns: use BigButton for interactions, Framer Motion for animations, useLocalStorage for persistence
+3. Add app entry to `appsList` array in `HomePage.tsx` with id, name, emoji, color, route
+4. Follow existing patterns:
+   - Use `AppHeader` for consistent header with home button
+   - Use `BigButton` for large touch-friendly buttons
+   - Use `useSyncedStorage` for data that should sync across devices
+   - Use `useLocalStorage` for device-specific preferences
+   - Use Framer Motion for animations
+   - Use `CelebrationModal` for positive feedback

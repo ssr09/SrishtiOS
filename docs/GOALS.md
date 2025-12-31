@@ -19,9 +19,10 @@ Create an engaging, educational app suite for Srishti (2.5 years old) that suppo
 - **No ads, no tracking**: Privacy-first for child data
 
 ### 3. Offline-First
-- **No backend required**: All data in localStorage
 - **Works without internet**: After initial load, fully functional offline
-- **Fast loading**: Optimized bundle, no external API calls
+- **Optional cloud sync**: Firebase Firestore for cross-device sync (when enabled)
+- **Fast loading**: Optimized bundle, minimal external API calls
+- **Graceful degradation**: Falls back to localStorage when offline
 
 ### 4. Mobile-First
 - **Touch optimized**: No hover-dependent interactions
@@ -65,6 +66,7 @@ Create an engaging, educational app suite for Srishti (2.5 years old) that suppo
 - [ ] Sound effects library
 
 ### Technical
+- [x] Cross-device sync via Firebase Firestore (family codes)
 - [ ] PWA manifest for better home screen experience
 - [ ] Service worker for true offline support
 - [ ] Parental screen time controls
@@ -84,4 +86,4 @@ Since this is a personal project, success is measured by:
 - Monetization (no ads, no in-app purchases)
 - Social features (no sharing, no multiplayer)
 - Complex gamification (no levels, XP systems)
-- Backend/accounts (keeping it simple and private)
+- User accounts/login (using simple family codes instead)
