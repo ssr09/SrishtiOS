@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
+import { useSuccessChime } from '../../shared/hooks/useSuccessChime';
 import { AppHeader } from '../../shared/components/AppHeader';
 import { CelebrationModal } from '../../shared/components/CelebrationModal';
 
@@ -13,6 +14,7 @@ export const CountingGame: React.FC = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [score, setScore] = useState(0);
   const { speak } = useVoice();
+  const { playChime } = useSuccessChime();
 
   useEffect(() => {
     generateRound();
@@ -52,7 +54,8 @@ export const CountingGame: React.FC = () => {
       // Correct!
       setShowCelebration(true);
       setScore(score + 1);
-      speak(`Yes! ${targetCount}! Great counting!`);
+      playChime();
+      speak(String(targetCount));
 
       setTimeout(() => {
         setShowCelebration(false);
@@ -162,7 +165,6 @@ export const CountingGame: React.FC = () => {
       <CelebrationModal
         show={showCelebration}
         message={`${targetCount}!`}
-        subMessage="Perfect Counting!"
         gradient="bg-gradient-to-br from-green-300 to-blue-400"
       />
     </div>

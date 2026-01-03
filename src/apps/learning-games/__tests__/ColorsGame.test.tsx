@@ -13,6 +13,13 @@ vi.mock('../../../shared/hooks/useVoice', () => ({
   }),
 }));
 
+// Mock useSuccessChime hook
+vi.mock('../../../shared/hooks/useSuccessChime', () => ({
+  useSuccessChime: () => ({
+    playChime: vi.fn(),
+  }),
+}));
+
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
@@ -54,9 +61,9 @@ describe('ColorsGame', () => {
   it('should render 4 color options', () => {
     renderWithNavigation(<ColorsGame />);
 
-    // Should have 4 color option buttons + 1 home button = 5 buttons
+    // Should have 4 color option buttons + 1 home button + 1 prompt button = 6 buttons
     const buttons = screen.getAllByRole('button');
-    expect(buttons.length).toBe(5);
+    expect(buttons.length).toBe(6);
   });
 
   it('should display a prompt asking to find a color', () => {

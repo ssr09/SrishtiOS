@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
+import { useSuccessChime } from '../../shared/hooks/useSuccessChime';
 import { useGameRound } from '../../shared/hooks/useGameRound';
 import { AppHeader } from '../../shared/components/AppHeader';
 import { CelebrationModal } from '../../shared/components/CelebrationModal';
@@ -33,6 +34,7 @@ export const ColorsGame: React.FC = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [score, setScore] = useState(0);
   const { speak, stop } = useVoice();
+  const { playChime } = useSuccessChime();
   const timeoutsRef = useRef<number[]>([]);
 
   // Cleanup on unmount
@@ -52,7 +54,8 @@ export const ColorsGame: React.FC = () => {
       // Correct!
       setShowCelebration(true);
       setScore(score + 1);
-      speak(`Good job! That's ${color.name}!`);
+      playChime();
+      speak(color.name);
 
       const t = window.setTimeout(() => {
         setShowCelebration(false);
@@ -135,7 +138,7 @@ export const ColorsGame: React.FC = () => {
       {/* Celebration */}
       <CelebrationModal
         show={showCelebration}
-        message="Good job!"
+        message={targetColor.emoji}
         gradient="bg-gradient-to-br from-yellow-300 to-orange-400"
       />
     </div>

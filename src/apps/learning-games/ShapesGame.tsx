@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
+import { useSuccessChime } from '../../shared/hooks/useSuccessChime';
 import { useGameRound } from '../../shared/hooks/useGameRound';
 import { AppHeader } from '../../shared/components/AppHeader';
 import { CelebrationModal } from '../../shared/components/CelebrationModal';
@@ -116,6 +117,7 @@ export const ShapesGame: React.FC = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [score, setScore] = useState(0);
   const { speak, stop } = useVoice();
+  const { playChime } = useSuccessChime();
   const timeoutsRef = useRef<number[]>([]);
 
   // Cleanup on unmount
@@ -141,7 +143,8 @@ export const ShapesGame: React.FC = () => {
       // Correct!
       setShowCelebration(true);
       setScore(score + 1);
-      speak(`Good job! That's a ${shape.name}!`);
+      playChime();
+      speak(shape.name);
 
       const t = window.setTimeout(() => {
         setShowCelebration(false);
@@ -222,7 +225,7 @@ export const ShapesGame: React.FC = () => {
       {/* Celebration */}
       <CelebrationModal
         show={showCelebration}
-        message="Good job!"
+        message={targetShape.emoji}
         gradient="bg-gradient-to-br from-purple-300 to-pink-400"
       />
     </div>
