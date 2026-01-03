@@ -55,7 +55,7 @@ export const ColorsGame: React.FC = () => {
       setShowCelebration(true);
       setScore(score + 1);
       playChime();
-      speak(color.name);
+      speak(`Yes! That's ${color.name}`);
 
       const t = window.setTimeout(() => {
         setShowCelebration(false);

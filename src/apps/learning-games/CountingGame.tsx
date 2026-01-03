@@ -55,7 +55,7 @@ export const CountingGame: React.FC = () => {
       setShowCelebration(true);
       setScore(score + 1);
       playChime();
-      speak(String(targetCount));
+      speak(`Yes! That's ${targetCount}`);
 
       setTimeout(() => {
         setShowCelebration(false);

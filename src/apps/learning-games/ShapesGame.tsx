@@ -144,7 +144,7 @@ export const ShapesGame: React.FC = () => {
       setShowCelebration(true);
       setScore(score + 1);
       playChime();
-      speak(shape.name);
+      speak(`Yes! That's a ${shape.name}`);
 
       const t = window.setTimeout(() => {
         setShowCelebration(false);
