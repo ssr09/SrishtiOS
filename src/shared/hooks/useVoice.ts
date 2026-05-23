@@ -22,12 +22,13 @@ const DEFAULT_PITCH = 1.15; // Slightly higher for warmth
 
 export const useVoice = () => {
   const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const [isSupported, setIsSupported] = useState(false);
-  const pendingSpeakRef = useRef<number | null>(null);
+  const [isSupported, setIsSupported] = useState(
+    () => 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
+  );
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
-    if (!('speechSynthesis' in window)) {
+    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
       setIsSupported(false);
       return;
     }
@@ -62,12 +63,12 @@ export const useVoice = () => {
 
     // Voices may load asynchronously
     selectBestVoice();
-    speechSynthesis.addEventListener('voiceschanged', selectBestVoice);
+    speechSynthesis.onvoiceschanged = selectBestVoice;
     window.addEventListener('pointerdown', resumeSpeech);
     window.addEventListener('touchstart', resumeSpeech);
 
     return () => {
-      speechSynthesis.removeEventListener('voiceschanged', selectBestVoice);
+      speechSynthesis.onvoiceschanged = null;
       window.removeEventListener('pointerdown', resumeSpeech);
       window.removeEventListener('touchstart', resumeSpeech);
     };
@@ -75,11 +76,6 @@ export const useVoice = () => {
 
   const speak = useCallback((text: string, options: VoiceOptions = {}) => {
     if (!isSupported || !text.trim()) return;
-
-    if (pendingSpeakRef.current) {
-      window.clearTimeout(pendingSpeakRef.current);
-      pendingSpeakRef.current = null;
-    }
 
     utteranceRef.current = null;
     speechSynthesis.resume();
@@ -104,20 +100,11 @@ export const useVoice = () => {
       utteranceRef.current = null;
     };
 
-    // Some browsers silently drop an utterance started immediately after cancel().
-    pendingSpeakRef.current = window.setTimeout(() => {
-      pendingSpeakRef.current = null;
-      speechSynthesis.resume();
-      speechSynthesis.speak(utterance);
-    }, 50);
+    speechSynthesis.speak(utterance);
   }, [voice, isSupported]);
 
   const stop = useCallback(() => {
     if (isSupported) {
-      if (pendingSpeakRef.current) {
-        window.clearTimeout(pendingSpeakRef.current);
-        pendingSpeakRef.current = null;
-      }
       utteranceRef.current = null;
       speechSynthesis.cancel();
     }
