@@ -24,21 +24,39 @@ const animals: Animal[] = [
   // Pets
   { id: 'dog', name: 'Dog', emoji: '🐶', soundText: 'Woof' },
   { id: 'cat', name: 'Cat', emoji: '🐱', soundText: 'Meow' },
+  { id: 'rabbit', name: 'Rabbit', emoji: '🐰', soundText: 'Hop hop' },
+  { id: 'mouse', name: 'Mouse', emoji: '🐭', soundText: 'Squeak' },
   // Wild Animals
   { id: 'lion', name: 'Lion', emoji: '🦁', soundText: 'Roar' },
   { id: 'tiger', name: 'Tiger', emoji: '🐯', soundText: 'Roar' },
+  { id: 'bear', name: 'Bear', emoji: '🐻', soundText: 'Growl' },
+  { id: 'panda', name: 'Panda', emoji: '🐼', soundText: 'Munch' },
   { id: 'elephant', name: 'Elephant', emoji: '🐘', soundText: 'Trumpet' },
+  { id: 'giraffe', name: 'Giraffe', emoji: '🦒', soundText: 'Hum' },
+  { id: 'zebra', name: 'Zebra', emoji: '🦓', soundText: 'Bray' },
+  { id: 'kangaroo', name: 'Kangaroo', emoji: '🦘', soundText: 'Boing' },
   { id: 'monkey', name: 'Monkey', emoji: '🐵', soundText: 'Ooh ooh' },
   { id: 'gorilla', name: 'Gorilla', emoji: '🦍', soundText: 'Grunt' },
   { id: 'wolf', name: 'Wolf', emoji: '🐺', soundText: 'Howl' },
+  { id: 'fox', name: 'Fox', emoji: '🦊', soundText: 'Yip' },
   { id: 'frog', name: 'Frog', emoji: '🐸', soundText: 'Ribbit' },
   { id: 'snake', name: 'Snake', emoji: '🐍', soundText: 'Hiss' },
+  { id: 'crocodile', name: 'Crocodile', emoji: '🐊', soundText: 'Snap' },
   // Birds
   { id: 'bird', name: 'Bird', emoji: '🐦', soundText: 'Tweet' },
   { id: 'owl', name: 'Owl', emoji: '🦉', soundText: 'Hoot' },
   { id: 'parrot', name: 'Parrot', emoji: '🦜', soundText: 'Squawk' },
+  { id: 'penguin', name: 'Penguin', emoji: '🐧', soundText: 'Honk' },
+  // Ocean Animals
+  { id: 'fish', name: 'Fish', emoji: '🐟', soundText: 'Blub' },
+  { id: 'whale', name: 'Whale', emoji: '🐋', soundText: 'Whooo' },
+  { id: 'dolphin', name: 'Dolphin', emoji: '🐬', soundText: 'Click click' },
+  { id: 'crab', name: 'Crab', emoji: '🦀', soundText: 'Click clack' },
+  { id: 'octopus', name: 'Octopus', emoji: '🐙', soundText: 'Squish' },
   // Insects
   { id: 'bee', name: 'Bee', emoji: '🐝', soundText: 'Buzz' },
+  { id: 'butterfly', name: 'Butterfly', emoji: '🦋', soundText: 'Flutter' },
+  { id: 'ladybug', name: 'Ladybug', emoji: '🐞', soundText: 'Tiny crawl' },
 ];
 
 export const AnimalSounds: React.FC = () => {

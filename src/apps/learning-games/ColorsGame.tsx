@@ -45,10 +45,6 @@ export const ColorsGame: React.FC = () => {
     };
   }, [stop]);
 
-  useEffect(() => {
-    generateRound();
-  }, []);
-
   const handleColorClick = (color: Color) => {
     if (color.name === targetColor.name) {
       // Correct!

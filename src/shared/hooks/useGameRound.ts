@@ -18,27 +18,38 @@ export function useGameRound<T>({
   optionCount = 4,
   getKey,
 }: UseGameRoundOptions<T>): UseGameRoundReturn<T> {
-  const [target, setTarget] = useState<T>(items[0]);
-  const [options, setOptions] = useState<T[]>([]);
-  const [round, setRound] = useState(0);
-
-  const generateRound = useCallback(() => {
-    // Pick a random target, avoiding the current one
-    const availableItems = items.filter(item => getKey(item) !== getKey(target));
+  const createRound = useCallback((currentTarget?: T) => {
+    const availableItems = currentTarget
+      ? items.filter(item => getKey(item) !== getKey(currentTarget))
+      : items;
     const newTarget = availableItems[Math.floor(Math.random() * availableItems.length)];
-    setTarget(newTarget);
 
-    // Create options: target + (optionCount-1) random others
     const otherItems = items.filter(item => getKey(item) !== getKey(newTarget));
     const shuffled = [...otherItems].sort(() => Math.random() - 0.5);
     const selectedOptions = [newTarget, ...shuffled.slice(0, optionCount - 1)];
 
-    // Shuffle again so target isn't always first
-    setOptions(selectedOptions.sort(() => Math.random() - 0.5));
+    return {
+      target: newTarget,
+      options: selectedOptions.sort(() => Math.random() - 0.5),
+    };
+  }, [items, optionCount, getKey]);
 
-    // Increment round to trigger any side effects
-    setRound(r => r + 1);
-  }, [items, optionCount, getKey, target]);
+  const [gameRound, setGameRound] = useState(() => ({
+    ...createRound(),
+    round: 1,
+  }));
 
-  return { target, options, round, generateRound };
+  const generateRound = useCallback(() => {
+    setGameRound(currentRound => ({
+      ...createRound(currentRound.target),
+      round: currentRound.round + 1,
+    }));
+  }, [createRound]);
+
+  return {
+    target: gameRound.target,
+    options: gameRound.options,
+    round: gameRound.round,
+    generateRound,
+  };
 }

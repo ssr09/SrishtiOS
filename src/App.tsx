@@ -10,6 +10,9 @@ import { FoodMenu } from './apps/food-friends/FoodMenu';
 import { BathBuddy } from './apps/bath-buddy/BathBuddy';
 import { ColorsGame } from './apps/learning-games/ColorsGame';
 import { ShapesGame } from './apps/learning-games/ShapesGame';
+import { ColorShapesGame } from './apps/learning-games/ColorShapesGame';
+import { PhonicsGame } from './apps/learning-games/PhonicsGame';
+import { PhonicsCardsGame } from './apps/learning-games/PhonicsCardsGame';
 import { CountingGame } from './apps/learning-games/CountingGame';
 import { AnimalSounds } from './apps/learning-games/AnimalSounds';
 import { CreativeCanvas } from './apps/creative/CreativeCanvas';
@@ -34,6 +37,12 @@ function App() {
         return <ColorsGame />;
       case 'shapes':
         return <ShapesGame />;
+      case 'color-shapes':
+        return <ColorShapesGame />;
+      case 'phonics':
+        return <PhonicsGame />;
+      case 'phonics-cards':
+        return <PhonicsCardsGame />;
       case 'counting':
         return <CountingGame />;
       case 'animals':

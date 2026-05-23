@@ -44,6 +44,21 @@ const shapes: Shape[] = [
     emoji: '🔷',
     svg: <polygon points="100,10 190,100 100,190 10,100" fill="currentColor" />
   },
+  {
+    name: 'Rhombus',
+    emoji: '🔷',
+    svg: <polygon points="75,30 180,30 125,170 20,170" fill="currentColor" />
+  },
+  {
+    name: 'Trapezoid',
+    emoji: '🔶',
+    svg: <polygon points="55,45 145,45 185,165 15,165" fill="currentColor" />
+  },
+  {
+    name: 'Parallelogram',
+    emoji: '▱',
+    svg: <polygon points="60,45 185,45 140,165 15,165" fill="currentColor" />
+  },
   // Polygons
   {
     name: 'Pentagon',
@@ -101,11 +116,84 @@ const shapes: Shape[] = [
     emoji: '🌈',
     svg: <path d="M20,120 A80,80 0 0,1 180,120 Z" fill="currentColor" />
   },
+  {
+    name: 'Crescent',
+    emoji: '🌙',
+    svg: (
+      <>
+        <defs>
+          <mask id="crescentMask">
+            <circle cx="92" cy="100" r="78" fill="white" />
+            <circle cx="130" cy="82" r="72" fill="black" />
+          </mask>
+        </defs>
+        <circle cx="92" cy="100" r="78" fill="currentColor" mask="url(#crescentMask)" />
+      </>
+    )
+  },
+  {
+    name: 'Ring',
+    emoji: '⭕',
+    svg: (
+      <>
+        <circle cx="100" cy="100" r="78" fill="currentColor" />
+        <circle cx="100" cy="100" r="42" fill="white" />
+      </>
+    )
+  },
+  {
+    name: 'Teardrop',
+    emoji: '💧',
+    svg: <path d="M100,15 C145,70 168,105 168,135 C168,172 138,190 100,190 C62,190 32,172 32,135 C32,105 55,70 100,15 Z" fill="currentColor" />
+  },
+  {
+    name: 'Cloud',
+    emoji: '☁️',
+    svg: <path d="M58,145 C35,145 20,130 20,110 C20,91 34,77 53,76 C62,50 84,35 112,41 C134,46 151,63 156,86 C174,89 188,103 188,122 C188,136 176,145 160,145 Z" fill="currentColor" />
+  },
+  {
+    name: 'Kite',
+    emoji: '🪁',
+    svg: <polygon points="100,10 175,90 100,190 25,90" fill="currentColor" />
+  },
+  {
+    name: 'Cube',
+    emoji: '🧊',
+    svg: (
+      <>
+        <polygon points="75,25 155,55 155,145 75,115" fill="currentColor" opacity="0.85" />
+        <polygon points="45,55 75,25 75,115 45,145" fill="currentColor" opacity="0.65" />
+        <polygon points="45,145 75,115 155,145 125,175" fill="currentColor" />
+      </>
+    )
+  },
+  {
+    name: 'Cone',
+    emoji: '🍦',
+    svg: (
+      <>
+        <ellipse cx="100" cy="160" rx="65" ry="20" fill="currentColor" opacity="0.65" />
+        <path d="M100,20 L165,160 L35,160 Z" fill="currentColor" />
+      </>
+    )
+  },
+  {
+    name: 'Cylinder',
+    emoji: '🥫',
+    svg: (
+      <>
+        <rect x="40" y="55" width="120" height="105" fill="currentColor" />
+        <ellipse cx="100" cy="55" rx="60" ry="24" fill="currentColor" opacity="0.8" />
+        <ellipse cx="100" cy="160" rx="60" ry="24" fill="currentColor" opacity="0.6" />
+      </>
+    )
+  },
 ];
 
 const colors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#95E1D3', '#F38181', '#A8E6CF', '#FFB6C1'];
 
 const getShapeKey = (shape: Shape) => shape.name;
+const getRandomShapeColor = () => colors[Math.floor(Math.random() * colors.length)];
 
 export const ShapesGame: React.FC = () => {
   const { target: targetShape, options, round, generateRound: generateShapeRound } = useGameRound({
@@ -113,7 +201,7 @@ export const ShapesGame: React.FC = () => {
     optionCount: 4,
     getKey: getShapeKey,
   });
-  const [shapeColor, setShapeColor] = useState(colors[0]);
+  const [shapeColor, setShapeColor] = useState(getRandomShapeColor);
   const [showCelebration, setShowCelebration] = useState(false);
   const [score, setScore] = useState(0);
   const { speak, stop } = useVoice();
@@ -131,12 +219,8 @@ export const ShapesGame: React.FC = () => {
   const generateRound = () => {
     generateShapeRound();
     // Pick random color
-    setShapeColor(colors[Math.floor(Math.random() * colors.length)]);
+    setShapeColor(getRandomShapeColor);
   };
-
-  useEffect(() => {
-    generateRound();
-  }, []);
 
   const handleShapeClick = (shape: Shape) => {
     if (shape.name === targetShape.name) {
