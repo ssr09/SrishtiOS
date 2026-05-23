@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
 import { useSuccessChime } from '../../shared/hooks/useSuccessChime';
@@ -208,6 +208,12 @@ export const ShapesGame: React.FC = () => {
   const { playChime } = useSuccessChime();
   const timeoutsRef = useRef<number[]>([]);
 
+  const clearPendingSpeech = useCallback(() => {
+    timeoutsRef.current.forEach(t => clearTimeout(t));
+    timeoutsRef.current = [];
+    stop();
+  }, [stop]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -223,12 +229,17 @@ export const ShapesGame: React.FC = () => {
   };
 
   const handleShapeClick = (shape: Shape) => {
+    clearPendingSpeech();
+
     if (shape.name === targetShape.name) {
       // Correct!
       setShowCelebration(true);
-      setScore(score + 1);
+      setScore(currentScore => currentScore + 1);
       playChime();
-      speak(`Yes! That's a ${shape.name}`);
+      const answerTimer = window.setTimeout(() => {
+        speak(`Yes! That's a ${shape.name}`);
+      }, 250);
+      timeoutsRef.current.push(answerTimer);
 
       const t = window.setTimeout(() => {
         setShowCelebration(false);
@@ -271,7 +282,10 @@ export const ShapesGame: React.FC = () => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => speak(`Can you find the ${targetShape.name}?`)}
+        onClick={() => {
+          clearPendingSpeech();
+          speak(`Can you find the ${targetShape.name}?`);
+        }}
         className="bg-white rounded-3xl p-6 shadow-2xl mx-auto text-center cursor-pointer hover:shadow-3xl transition-shadow"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">

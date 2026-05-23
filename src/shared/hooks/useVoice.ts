@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface VoiceOptions {
   rate?: number;
@@ -23,6 +23,8 @@ const DEFAULT_PITCH = 1.15; // Slightly higher for warmth
 export const useVoice = () => {
   const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [isSupported, setIsSupported] = useState(false);
+  const pendingSpeakRef = useRef<number | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
     if (!('speechSynthesis' in window)) {
@@ -43,7 +45,6 @@ export const useVoice = () => {
         );
         if (found) {
           setVoice(found);
-          console.log(`🎙️ Selected voice: ${found.name}`);
           return;
         }
       }
@@ -52,26 +53,40 @@ export const useVoice = () => {
       const englishVoice = voices.find(v => v.lang.startsWith('en'));
       if (englishVoice) {
         setVoice(englishVoice);
-        console.log(`🎙️ Fallback voice: ${englishVoice.name}`);
       }
+    };
+
+    const resumeSpeech = () => {
+      speechSynthesis.resume();
     };
 
     // Voices may load asynchronously
     selectBestVoice();
-    speechSynthesis.onvoiceschanged = selectBestVoice;
+    speechSynthesis.addEventListener('voiceschanged', selectBestVoice);
+    window.addEventListener('pointerdown', resumeSpeech);
+    window.addEventListener('touchstart', resumeSpeech);
 
     return () => {
-      speechSynthesis.onvoiceschanged = null;
+      speechSynthesis.removeEventListener('voiceschanged', selectBestVoice);
+      window.removeEventListener('pointerdown', resumeSpeech);
+      window.removeEventListener('touchstart', resumeSpeech);
     };
   }, []);
 
   const speak = useCallback((text: string, options: VoiceOptions = {}) => {
-    if (!isSupported) return;
+    if (!isSupported || !text.trim()) return;
 
-    // Cancel any ongoing speech
+    if (pendingSpeakRef.current) {
+      window.clearTimeout(pendingSpeakRef.current);
+      pendingSpeakRef.current = null;
+    }
+
+    utteranceRef.current = null;
+    speechSynthesis.resume();
     speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
+    utteranceRef.current = utterance;
 
     if (voice) {
       utterance.voice = voice;
@@ -80,15 +95,30 @@ export const useVoice = () => {
     utterance.rate = options.rate ?? DEFAULT_RATE;
     utterance.pitch = options.pitch ?? DEFAULT_PITCH;
 
-    if (options.onEnd) {
-      utterance.onend = options.onEnd;
-    }
+    utterance.onend = () => {
+      utteranceRef.current = null;
+      options.onEnd?.();
+    };
 
-    speechSynthesis.speak(utterance);
+    utterance.onerror = () => {
+      utteranceRef.current = null;
+    };
+
+    // Some browsers silently drop an utterance started immediately after cancel().
+    pendingSpeakRef.current = window.setTimeout(() => {
+      pendingSpeakRef.current = null;
+      speechSynthesis.resume();
+      speechSynthesis.speak(utterance);
+    }, 50);
   }, [voice, isSupported]);
 
   const stop = useCallback(() => {
     if (isSupported) {
+      if (pendingSpeakRef.current) {
+        window.clearTimeout(pendingSpeakRef.current);
+        pendingSpeakRef.current = null;
+      }
+      utteranceRef.current = null;
       speechSynthesis.cancel();
     }
   }, [isSupported]);

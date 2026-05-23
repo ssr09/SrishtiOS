@@ -55,11 +55,15 @@ export const PhonicsGame: React.FC = () => {
   const { playChime } = useSuccessChime();
   const timeoutsRef = useRef<number[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const timeouts = timeoutsRef.current;
     return () => {
       timeouts.forEach(t => clearTimeout(t));
+      if (audioTimeoutRef.current) {
+        clearTimeout(audioTimeoutRef.current);
+      }
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
@@ -74,19 +78,35 @@ export const PhonicsGame: React.FC = () => {
       audioRef.current.currentTime = 0;
     }
 
+    if (audioTimeoutRef.current) {
+      clearTimeout(audioTimeoutRef.current);
+      audioTimeoutRef.current = null;
+    }
+
     const audio = new Audio(`/sounds/phonics/${soundLetter.letter.toLowerCase()}.mp3`);
     audioRef.current = audio;
+    let didFinish = false;
 
-    audio.onended = () => {
+    const finishAudio = () => {
+      if (didFinish) return;
+      didFinish = true;
+      if (audioTimeoutRef.current) {
+        clearTimeout(audioTimeoutRef.current);
+        audioTimeoutRef.current = null;
+      }
       onEnd?.();
     };
 
+    audio.onended = finishAudio;
+
     audio.onerror = () => {
-      speak(soundLetter.spokenSound, { onEnd });
+      speak(soundLetter.spokenSound, { onEnd: finishAudio });
     };
 
+    audioTimeoutRef.current = window.setTimeout(finishAudio, 1600);
+
     audio.play().catch(() => {
-      speak(soundLetter.spokenSound, { onEnd });
+      speak(soundLetter.spokenSound, { onEnd: finishAudio });
     });
   }, [speak]);
 
@@ -96,6 +116,10 @@ export const PhonicsGame: React.FC = () => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+    }
+    if (audioTimeoutRef.current) {
+      clearTimeout(audioTimeoutRef.current);
+      audioTimeoutRef.current = null;
     }
     stop();
   }, [stop]);

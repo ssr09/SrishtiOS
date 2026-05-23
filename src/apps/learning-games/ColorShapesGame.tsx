@@ -290,7 +290,10 @@ export const ColorShapesGame: React.FC = () => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileTap={{ scale: 0.95 }}
-        onClick={speakQuestion}
+        onClick={() => {
+          clearPendingSpeech();
+          speakQuestion();
+        }}
         className="bg-white rounded-3xl p-4 md:p-6 shadow-2xl mx-auto text-center cursor-pointer hover:shadow-3xl transition-shadow"
       >
         <h2 className="text-2xl md:text-4xl font-bold text-gray-800 mb-3 md:mb-4">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '../../shared/hooks/useVoice';
 import { useSuccessChime } from '../../shared/hooks/useSuccessChime';
@@ -37,6 +37,12 @@ export const ColorsGame: React.FC = () => {
   const { playChime } = useSuccessChime();
   const timeoutsRef = useRef<number[]>([]);
 
+  const clearPendingSpeech = useCallback(() => {
+    timeoutsRef.current.forEach(t => clearTimeout(t));
+    timeoutsRef.current = [];
+    stop();
+  }, [stop]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -46,12 +52,17 @@ export const ColorsGame: React.FC = () => {
   }, [stop]);
 
   const handleColorClick = (color: Color) => {
+    clearPendingSpeech();
+
     if (color.name === targetColor.name) {
       // Correct!
       setShowCelebration(true);
-      setScore(score + 1);
+      setScore(currentScore => currentScore + 1);
       playChime();
-      speak(`Yes! That's ${color.name}`);
+      const answerTimer = window.setTimeout(() => {
+        speak(`Yes! That's ${color.name}`);
+      }, 250);
+      timeoutsRef.current.push(answerTimer);
 
       const t = window.setTimeout(() => {
         setShowCelebration(false);
@@ -94,7 +105,10 @@ export const ColorsGame: React.FC = () => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => speak(`Can you find ${targetColor.name}?`)}
+        onClick={() => {
+          clearPendingSpeech();
+          speak(`Can you find ${targetColor.name}?`);
+        }}
         className="bg-white rounded-3xl p-6 shadow-2xl mx-auto text-center cursor-pointer hover:shadow-3xl transition-shadow"
       >
         <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: targetColor.hex }}>

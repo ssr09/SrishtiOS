@@ -41,42 +41,94 @@ const phonicCards: PhonicCard[] = [
 export const PhonicsCardsGame: React.FC = () => {
   const [selectedCard, setSelectedCard] = useState<PhonicCard | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const timeoutRef = useRef<number | null>(null);
+  const audioTimeoutRef = useRef<number | null>(null);
+  const wordTimeoutRef = useRef<number | null>(null);
+  const resetTimeoutRef = useRef<number | null>(null);
+  const playbackTokenRef = useRef(0);
   const { speak, stop } = useVoice();
 
   useEffect(() => {
     return () => {
+      playbackTokenRef.current += 1;
+
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
       }
 
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (audioTimeoutRef.current) {
+        clearTimeout(audioTimeoutRef.current);
+      }
+
+      if (wordTimeoutRef.current) {
+        clearTimeout(wordTimeoutRef.current);
+      }
+
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
       }
 
       stop();
     };
   }, [stop]);
 
-  const clearPendingWord = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+  const clearPendingPlayback = () => {
+    playbackTokenRef.current += 1;
+
+    if (wordTimeoutRef.current) {
+      clearTimeout(wordTimeoutRef.current);
+      wordTimeoutRef.current = null;
     }
+
+    if (resetTimeoutRef.current) {
+      clearTimeout(resetTimeoutRef.current);
+      resetTimeoutRef.current = null;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    if (audioTimeoutRef.current) {
+      clearTimeout(audioTimeoutRef.current);
+      audioTimeoutRef.current = null;
+    }
+
+    stop();
   };
 
-  const speakExampleWord = (card: PhonicCard) => {
-    timeoutRef.current = window.setTimeout(() => {
+  const clearSelection = (token: number) => {
+    if (playbackTokenRef.current !== token) return;
+
+    if (resetTimeoutRef.current) {
+      clearTimeout(resetTimeoutRef.current);
+      resetTimeoutRef.current = null;
+    }
+
+    setSelectedCard(null);
+  };
+
+  const speakExampleWord = (card: PhonicCard, token: number) => {
+    wordTimeoutRef.current = window.setTimeout(() => {
+      if (playbackTokenRef.current !== token) return;
+
+      const fallbackDuration = Math.max(900, card.exampleWord.length * 140 + 500);
+      resetTimeoutRef.current = window.setTimeout(() => {
+        clearSelection(token);
+      }, fallbackDuration);
+
       speak(card.exampleWord, {
         rate: 0.8,
         pitch: 1.1,
-        onEnd: () => setSelectedCard(null),
+        onEnd: () => clearSelection(token),
       });
-    }, 550);
+    }, 350);
   };
 
-  const playPhonicSound = (card: PhonicCard, repeatCount = 0) => {
+  const playPhonicSound = (card: PhonicCard, token: number, repeatCount = 0) => {
+    if (playbackTokenRef.current !== token) return;
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -84,27 +136,40 @@ export const PhonicsCardsGame: React.FC = () => {
 
     const audio = new Audio(`/sounds/phonics/${card.letter.toLowerCase()}.mp3`);
     audioRef.current = audio;
+    let didFinish = false;
 
-    audio.onended = () => {
+    const finishAudio = () => {
+      if (didFinish || playbackTokenRef.current !== token) return;
+      didFinish = true;
+      if (audioTimeoutRef.current) {
+        clearTimeout(audioTimeoutRef.current);
+        audioTimeoutRef.current = null;
+      }
+
       if (repeatCount < 1) {
-        playPhonicSound(card, repeatCount + 1);
+        playPhonicSound(card, token, repeatCount + 1);
         return;
       }
 
-      speakExampleWord(card);
+      speakExampleWord(card, token);
     };
-    audio.onerror = () => speakExampleWord(card);
+
+    audio.onended = finishAudio;
+    audio.onerror = finishAudio;
+
+    audioTimeoutRef.current = window.setTimeout(finishAudio, 1600);
 
     audio.play().catch(() => {
-      speakExampleWord(card);
+      finishAudio();
     });
   };
 
   const handleCardClick = (card: PhonicCard) => {
+    clearPendingPlayback();
+    const token = playbackTokenRef.current;
+
     setSelectedCard(card);
-    stop();
-    clearPendingWord();
-    playPhonicSound(card);
+    playPhonicSound(card, token);
   };
 
   return (

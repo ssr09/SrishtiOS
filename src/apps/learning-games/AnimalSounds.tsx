@@ -63,11 +63,14 @@ export const AnimalSounds: React.FC = () => {
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timeoutRef = useRef<number | null>(null);
+  const resetTimeoutRef = useRef<number | null>(null);
+  const playbackTokenRef = useRef(0);
   const { speak, stop } = useVoice();
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      playbackTokenRef.current += 1;
       // Stop any playing audio
       if (audioRef.current) {
         audioRef.current.pause();
@@ -77,31 +80,79 @@ export const AnimalSounds: React.FC = () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+      }
       // Stop speech synthesis
       stop();
     };
   }, [stop]);
 
-  const playSound = (animal: Animal) => {
+  const clearSelectedAnimal = (token: number) => {
+    if (playbackTokenRef.current !== token) return;
+    setSelectedAnimal(null);
+  };
+
+  const clearPendingPlayback = () => {
+    playbackTokenRef.current += 1;
+
     // Stop any currently playing sound
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
 
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    if (resetTimeoutRef.current) {
+      clearTimeout(resetTimeoutRef.current);
+      resetTimeoutRef.current = null;
+    }
+
+    stop();
+  };
+
+  const playSound = (animal: Animal, token: number) => {
+    if (playbackTokenRef.current !== token) return;
+
     // Create and play new audio
     const audio = new Audio(`/sounds/animals/${animal.id}.mp3`);
     audioRef.current = audio;
+    let didFinish = false;
 
-    audio.onended = () => {
-      setSelectedAnimal(null);
+    const finishPlayback = () => {
+      if (didFinish || playbackTokenRef.current !== token) return;
+      didFinish = true;
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+        resetTimeoutRef.current = null;
+      }
+      clearSelectedAnimal(token);
     };
+
+    audio.onended = finishPlayback;
 
     audio.onerror = () => {
+      if (didFinish || playbackTokenRef.current !== token) return;
+      didFinish = true;
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+      }
       // Fallback to speech synthesis if audio file not found
       speak(animal.soundText, { pitch: 1.4, rate: 0.9 });
-      setTimeout(() => setSelectedAnimal(null), 1000);
+      resetTimeoutRef.current = window.setTimeout(() => clearSelectedAnimal(token), 1200);
     };
+
+    audio.onloadedmetadata = () => {
+      if (playbackTokenRef.current !== token) return;
+      const durationMs = Number.isFinite(audio.duration) ? audio.duration * 1000 : 4000;
+      resetTimeoutRef.current = window.setTimeout(finishPlayback, Math.min(Math.max(durationMs + 700, 1500), 7000));
+    };
+
+    resetTimeoutRef.current = window.setTimeout(finishPlayback, 7000);
 
     audio.play().catch(() => {
       audio.onerror?.(new Event('error'));
@@ -109,17 +160,13 @@ export const AnimalSounds: React.FC = () => {
   };
 
   const handleAnimalClick = (animal: Animal) => {
+    clearPendingPlayback();
+    const token = playbackTokenRef.current;
     setSelectedAnimal(animal);
-    stop();
-
-    // Clear any pending timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
 
     // First speak the animal name, then play the sound
     speak(animal.name, { rate: 0.9 });
-    timeoutRef.current = window.setTimeout(() => playSound(animal), 800);
+    timeoutRef.current = window.setTimeout(() => playSound(animal, token), 800);
   };
 
   return (
