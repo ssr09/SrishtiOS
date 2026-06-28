@@ -13,6 +13,7 @@ import { ShapesGame } from './apps/learning-games/ShapesGame';
 import { ColorShapesGame } from './apps/learning-games/ColorShapesGame';
 import { PhonicsGame } from './apps/learning-games/PhonicsGame';
 import { PhonicsCardsGame } from './apps/learning-games/PhonicsCardsGame';
+import { FirstCountingGame } from './apps/learning-games/FirstCountingGame';
 import { CountingGame } from './apps/learning-games/CountingGame';
 import { AnimalSounds } from './apps/learning-games/AnimalSounds';
 import { CreativeCanvas } from './apps/creative/CreativeCanvas';
@@ -43,6 +44,8 @@ function App() {
         return <PhonicsGame />;
       case 'phonics-cards':
         return <PhonicsCardsGame />;
+      case 'first-counting':
+        return <FirstCountingGame />;
       case 'counting':
         return <CountingGame />;
       case 'animals':

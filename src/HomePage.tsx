@@ -16,6 +16,7 @@ export const apps = [
   { id: 'color-shapes', name: 'Color Shapes', emoji: '🟢', color: 'bg-lime-400' },
   { id: 'phonics', name: 'Phonics', emoji: '🔤', color: 'bg-sky-400' },
   { id: 'phonics-cards', name: 'Phonics Cards', emoji: 'Aa', color: 'bg-violet-400' },
+  { id: 'first-counting', name: 'First Counting', emoji: '🍎', color: 'bg-emerald-400' },
   { id: 'counting', name: 'Counting', emoji: '🔢', color: 'bg-indigo-400' },
   { id: 'animals', name: 'Animals', emoji: '🦁', color: 'bg-amber-400' },
   { id: 'draw', name: 'Draw', emoji: '✏️', color: 'bg-rose-400' },
