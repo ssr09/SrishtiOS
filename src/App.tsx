@@ -17,6 +17,7 @@ import { FirstCountingGame } from './apps/learning-games/FirstCountingGame';
 import { CountingGame } from './apps/learning-games/CountingGame';
 import { AnimalSounds } from './apps/learning-games/AnimalSounds';
 import { CreativeCanvas } from './apps/creative/CreativeCanvas';
+import { AnimalColoringGame } from './apps/creative/AnimalColoringGame';
 import { StoryTime } from './apps/stories/StoryTime';
 
 function App() {
@@ -52,6 +53,8 @@ function App() {
         return <AnimalSounds />;
       case 'draw':
         return <CreativeCanvas />;
+      case 'color-animals':
+        return <AnimalColoringGame />;
       case 'stories':
         return <StoryTime />;
       case 'home':

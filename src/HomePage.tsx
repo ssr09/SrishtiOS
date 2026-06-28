@@ -20,6 +20,7 @@ export const apps = [
   { id: 'counting', name: 'Counting', emoji: '🔢', color: 'bg-indigo-400' },
   { id: 'animals', name: 'Animals', emoji: '🦁', color: 'bg-amber-400' },
   { id: 'draw', name: 'Draw', emoji: '✏️', color: 'bg-rose-400' },
+  { id: 'color-animals', name: 'Color Animals', emoji: '🦏', color: 'bg-fuchsia-400' },
   { id: 'stories', name: 'Stories', emoji: '📖', color: 'bg-teal-400' },
 ];
 
