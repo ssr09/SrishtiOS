@@ -21,6 +21,11 @@ interface CanvasHandle {
   undo: () => void;
 }
 
+interface ColoringMemory {
+  savedPagesRef: React.MutableRefObject<Record<string, string>>;
+  historiesRef: React.MutableRefObject<Record<string, string[]>>;
+}
+
 const animalPresets: AnimalPreset[] = [
   { id: 'rhino', name: 'Rhino', emoji: '🦏', imageSrc: '/coloring/animals/rhino.png' },
   { id: 'lion', name: 'Lion', emoji: '🦁', imageSrc: '/coloring/animals/lion.png' },
@@ -32,33 +37,38 @@ const animalPresets: AnimalPreset[] = [
   { id: 'hippo', name: 'Hippo', emoji: '🦛', imageSrc: '/coloring/animals/hippo.png' },
 ];
 
-const paletteColors = [
-  '#ffffff',
-  '#ffd60a',
-  '#ff7a00',
-  '#98d800',
-  '#5ee9e9',
-  '#f75c9b',
-  '#f2b85b',
-  '#d90000',
-  '#279600',
-  '#0ea5a5',
-  '#a83272',
-  '#b9853d',
-  '#303030',
-  '#7f0000',
-  '#063f08',
-  '#1111a5',
-  '#ff0066',
-  '#7a3d00',
+const paletteGroups = [
+  { name: 'white', colors: ['#ffffff', '#f3f4f6', '#d1d5db'] },
+  { name: 'black', colors: ['#6b7280', '#303030', '#000000'] },
+  { name: 'pink', colors: ['#f9a8d4', '#f75c9b', '#ff0066'] },
+  { name: 'orange', colors: ['#fed7aa', '#ff7a00', '#c2410c'] },
+  { name: 'brown', colors: ['#f2b85b', '#b9853d', '#7a3d00'] },
+  { name: 'red', colors: ['#fca5a5', '#d90000', '#7f0000'] },
+  { name: 'yellow', colors: ['#fff7ad', '#ffd60a', '#d6a900'] },
+  { name: 'green', colors: ['#bbf7d0', '#279600', '#063f08'] },
+  { name: 'blue', colors: ['#93c5fd', '#1111a5', '#06145f'] },
+  { name: 'purple', colors: ['#d8b4fe', '#a83272', '#581c87'] },
 ];
+
+const paletteColors = paletteGroups.flatMap(group => group.colors);
 
 const colorNames: Record<string, string> = {
   '#ffffff': 'white',
+  '#f3f4f6': 'soft white',
+  '#d1d5db': 'light gray',
+  '#6b7280': 'gray',
+  '#000000': 'deep black',
+  '#f9a8d4': 'light pink',
   '#ffd60a': 'yellow',
+  '#fff7ad': 'light yellow',
+  '#d6a900': 'dark yellow',
   '#ff7a00': 'orange',
-  '#98d800': 'lime',
-  '#5ee9e9': 'aqua',
+  '#fed7aa': 'light orange',
+  '#c2410c': 'dark orange',
+  '#bbf7d0': 'light green',
+  '#93c5fd': 'light blue',
+  '#d8b4fe': 'light purple',
+  '#fca5a5': 'light red',
   '#f75c9b': 'pink',
   '#f2b85b': 'tan',
   '#d90000': 'red',
@@ -70,8 +80,10 @@ const colorNames: Record<string, string> = {
   '#7f0000': 'dark red',
   '#063f08': 'dark green',
   '#1111a5': 'blue',
+  '#06145f': 'dark blue',
   '#ff0066': 'hot pink',
   '#7a3d00': 'dark brown',
+  '#581c87': 'dark purple',
 };
 
 const hexToRgb = (hex: string): [number, number, number] => {
@@ -81,6 +93,12 @@ const hexToRgb = (hex: string): [number, number, number] => {
     Number.parseInt(normalized.slice(2, 4), 16),
     Number.parseInt(normalized.slice(4, 6), 16),
   ];
+};
+
+const getBrushCursor = (color: string) => {
+  const stroke = color.toLowerCase() === '#ffffff' || color.toLowerCase() === '#fff7ad' ? '#111827' : '#ffffff';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="11" fill="${color}" stroke="${stroke}" stroke-width="4"/><circle cx="16" cy="16" r="14" fill="none" stroke="#111827" stroke-width="2"/></svg>`;
+  return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 16 16, crosshair`;
 };
 
 const useColoringSounds = () => {
@@ -235,15 +253,15 @@ const AnimalColoringCanvas = forwardRef<
   {
     animal: AnimalPreset;
     selectedColor: string;
+    memory: ColoringMemory;
     onFill: () => void;
     onUndoAvailabilityChange: (canUndo: boolean) => void;
   }
->(({ animal, selectedColor, onFill, onUndoAvailabilityChange }, ref) => {
+>(({ animal, selectedColor, memory, onFill, onUndoAvailabilityChange }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sourceImageRef = useRef<HTMLImageElement | null>(null);
   const outlineMaskRef = useRef<Uint8Array | null>(null);
-  const savedPagesRef = useRef<Record<string, string>>({});
-  const historiesRef = useRef<Record<string, string[]>>({});
+  const { savedPagesRef, historiesRef } = memory;
 
   const updateUndoAvailability = useCallback(() => {
     onUndoAvailabilityChange((historiesRef.current[animal.id] ?? []).length > 0);
@@ -369,6 +387,7 @@ const AnimalColoringCanvas = forwardRef<
         fillAtPoint(event.clientX, event.clientY);
       }}
       className="block h-full w-full touch-none bg-white"
+      style={{ cursor: getBrushCursor(selectedColor) }}
     />
   );
 });
@@ -377,10 +396,21 @@ AnimalColoringCanvas.displayName = 'AnimalColoringCanvas';
 
 export const AnimalColoringGame: React.FC = () => {
   const [selectedAnimalId, setSelectedAnimalId] = useState(animalPresets[0].id);
+  const [isColoring, setIsColoring] = useState(false);
   const [selectedColor, setSelectedColor] = useState(paletteColors[1]);
   const [canUndo, setCanUndo] = useState(false);
   const canvasHandleRef = useRef<CanvasHandle | null>(null);
+  const savedPagesRef = useRef<Record<string, string>>({});
+  const historiesRef = useRef<Record<string, string[]>>({});
   const { playSelectSound, playFillSound } = useColoringSounds();
+
+  const coloringMemory = useMemo(
+    () => ({
+      savedPagesRef,
+      historiesRef,
+    }),
+    []
+  );
 
   const selectedAnimal = useMemo(
     () => animalPresets.find(animal => animal.id === selectedAnimalId) ?? animalPresets[0],
@@ -389,6 +419,8 @@ export const AnimalColoringGame: React.FC = () => {
 
   const chooseAnimal = (animalId: string) => {
     setSelectedAnimalId(animalId);
+    setIsColoring(true);
+    setCanUndo((historiesRef.current[animalId] ?? []).length > 0);
     playSelectSound();
   };
 
@@ -407,59 +439,87 @@ export const AnimalColoringGame: React.FC = () => {
     playSelectSound();
   };
 
-  return (
-    <div className="min-h-screen bg-theme-bg p-4 md:p-8 flex flex-col gap-5 overflow-y-auto">
-      <AppHeader title="Color Animals" emoji="🦏" />
+  if (!isColoring) {
+    return (
+      <div className="min-h-screen bg-theme-bg p-4 md:p-8 flex flex-col gap-6 overflow-y-auto">
+        <AppHeader title="Color Animals" emoji="🦏" />
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-        {animalPresets.map(animal => {
-          const isSelected = animal.id === selectedAnimal.id;
-          return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto w-full">
+          {animalPresets.map(animal => (
             <button
               key={animal.id}
               onClick={() => chooseAnimal(animal.id)}
-              className={`bg-white rounded-2xl p-2 shadow-md border-4 transition-all ${isSelected ? 'border-theme-primary scale-105' : 'border-transparent'}`}
+              className="bg-white rounded-3xl p-3 shadow-xl border-4 border-transparent hover:border-theme-primary focus-visible:border-theme-primary outline-none transition-all hover:-translate-y-1"
             >
               <img
                 src={animal.imageSrc}
                 alt=""
-                className="w-full aspect-square object-cover rounded-xl border-2 border-gray-100"
+                className="w-full aspect-square object-cover rounded-2xl border-2 border-gray-100"
                 draggable={false}
               />
-              <div className="text-base md:text-lg font-bold text-theme-text mt-1">
+              <div className="text-2xl md:text-3xl font-black text-theme-text mt-3">
                 {animal.emoji} {animal.name}
               </div>
             </button>
-          );
-        })}
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-theme-bg p-4 md:p-6 flex flex-col gap-4 overflow-y-auto">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <AppHeader title={`Color ${selectedAnimal.name}`} emoji={selectedAnimal.emoji} />
+        <button
+          onClick={() => {
+            setIsColoring(false);
+            playSelectSound();
+          }}
+          className="px-5 py-3 rounded-2xl bg-white text-theme-text text-xl font-bold shadow-md border-2 border-gray-200"
+        >
+          Choose Animal
+        </button>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_260px] gap-5 flex-1">
-        <div className="bg-white rounded-3xl shadow-2xl border-4 border-gray-900 overflow-hidden min-h-[420px] aspect-square max-h-[min(72vh,900px)] mx-auto w-full max-w-[900px]">
+      <div className="grid xl:grid-cols-[minmax(0,1fr)_276px] gap-4 flex-1 items-start">
+        <div
+          className="bg-white rounded-3xl shadow-2xl border-4 border-gray-900 overflow-hidden aspect-square mx-auto w-full"
+          style={{ maxWidth: 'min(100%, calc(100vh - 180px), 920px)' }}
+        >
           <AnimalColoringCanvas
             ref={canvasHandleRef}
             animal={selectedAnimal}
             selectedColor={selectedColor}
+            memory={coloringMemory}
             onFill={playFillSound}
             onUndoAvailabilityChange={setCanUndo}
           />
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl p-4 md:p-5 flex lg:flex-col gap-4 overflow-x-auto">
-          <div className="flex lg:grid lg:grid-cols-3 gap-3">
-            {paletteColors.map(color => (
-              <button
-                key={color}
-                aria-label={`Choose ${colorNames[color]}`}
-                data-testid={`palette-color-${color}`}
-                onClick={() => chooseColor(color)}
-                className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl border-4 shadow-md shrink-0 transition-transform ${selectedColor === color ? 'border-gray-900 scale-110' : 'border-gray-200'}`}
-                style={{ backgroundColor: color }}
-              />
+        <div className="bg-white rounded-3xl shadow-xl p-4 flex xl:flex-col gap-4 overflow-x-auto xl:overflow-visible">
+          <div className="flex xl:flex-col gap-2 shrink-0">
+            {paletteGroups.map(group => (
+              <div
+                key={group.name}
+                className="grid grid-cols-[4.75rem_repeat(3,3rem)] items-center gap-2"
+              >
+                <div className="text-sm font-black uppercase text-gray-500">{group.name}</div>
+                {group.colors.map(color => (
+                  <button
+                    key={color}
+                    aria-label={`Choose ${colorNames[color]}`}
+                    data-testid={`palette-color-${color}`}
+                    onClick={() => chooseColor(color)}
+                    className={`w-12 h-12 rounded-2xl border-4 shadow-md shrink-0 transition-transform ${selectedColor === color ? 'border-gray-900 scale-110' : 'border-gray-200'}`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
             ))}
           </div>
 
-          <div className="flex lg:flex-col gap-3 ml-auto lg:ml-0">
+          <div className="flex xl:flex-col gap-3 ml-auto xl:ml-0 shrink-0">
             <button
               onClick={undo}
               disabled={!canUndo}
