@@ -1,44 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSyncedStorage } from '../../shared/hooks/useSyncedStorage';
-import { usePrint } from '../../shared/hooks/usePrint';
+import { useVoice } from '../../shared/hooks/useVoice';
 import { AppHeader } from '../../shared/components/AppHeader';
-import { SelectableCard } from '../../shared/components/SelectableCard';
 import type { Food, MealTime } from './foodDatabase';
 import { defaultFoods, mealTimeConfig } from './foodDatabase';
 
 export const FoodMenu: React.FC = () => {
   const [foods] = useSyncedStorage<Food[]>('foods', defaultFoods);
   const [selectedMealTime, setSelectedMealTime] = useState<MealTime>('breakfast');
-  const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
-  const { print } = usePrint();
+  const { speak } = useVoice();
 
   const filteredFoods = foods.filter(food => food.mealTime.includes(selectedMealTime));
-
-  const MAX_SELECTIONS = 3;
-
-  const toggleFood = (foodId: string) => {
-    setSelectedFoods(prev => {
-      if (prev.includes(foodId)) {
-        return prev.filter(id => id !== foodId);
-      }
-      if (prev.length >= MAX_SELECTIONS) {
-        return prev;
-      }
-      return [...prev, foodId];
-    });
-  };
-
-  const handlePrint = () => {
-    const selected = foods.filter(f => selectedFoods.includes(f.id));
-    const mealConfig = mealTimeConfig.find(m => m.id === selectedMealTime);
-    print(selected, {
-      title: mealConfig?.name || 'Meal',
-      titleEmoji: mealConfig?.emoji,
-      bgColor: '#FFF9E6',
-      textColor: '#2D2D2D',
-    });
-  };
 
   return (
     <div className="min-h-screen bg-theme-bg p-4 md:p-6">
@@ -96,13 +69,14 @@ export const FoodMenu: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <SelectableCard
-                      emoji={food.emoji}
-                      name={food.name}
-                      isSelected={selectedFoods.includes(food.id)}
-                      onClick={() => toggleFood(food.id)}
-                      selectedColor="bg-green-400"
-                    />
+                    <motion.button
+                      onClick={() => speak(food.name)}
+                      className="w-full rounded-3xl p-6 shadow-lg transition-all relative bg-white hover:scale-105 active:scale-95"
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <div className="text-8xl mb-3">{food.emoji}</div>
+                      <div className="text-2xl font-bold text-theme-text">{food.name}</div>
+                    </motion.button>
                   </motion.div>
                 ))}
               </motion.div>
@@ -110,22 +84,6 @@ export const FoodMenu: React.FC = () => {
           </AnimatePresence>
         </div>
       </div>
-
-      {/* Floating Print Button */}
-      <AnimatePresence>
-        {selectedFoods.length > 0 && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            onClick={handlePrint}
-            className="fixed bottom-6 right-6 w-20 h-20 bg-green-500 text-white rounded-full shadow-xl flex flex-col items-center justify-center hover:bg-green-600 active:scale-95 transition-all z-50"
-          >
-            <span className="text-3xl">🖨️</span>
-            <span className="text-xs font-bold">{selectedFoods.length}</span>
-          </motion.button>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

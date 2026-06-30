@@ -1,43 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSyncedStorage } from '../../shared/hooks/useSyncedStorage';
-import { usePrint } from '../../shared/hooks/usePrint';
+import { useVoice } from '../../shared/hooks/useVoice';
 import { AppHeader } from '../../shared/components/AppHeader';
-import { SelectableCard } from '../../shared/components/SelectableCard';
 import type { BathToy } from './toyDatabase';
 import { defaultToys, categoryConfig } from './toyDatabase';
 
 export const BathBuddy: React.FC = () => {
   const [toys] = useSyncedStorage<BathToy[]>('bathToys', defaultToys);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedToys, setSelectedToys] = useState<string[]>([]);
-  const { print } = usePrint();
+  const { speak } = useVoice();
 
   const filteredToys = toys.filter(toy => !selectedCategory || toy.category === selectedCategory);
-
-  const MAX_SELECTIONS = 3;
-
-  const toggleToy = (toyId: string) => {
-    setSelectedToys(prev => {
-      if (prev.includes(toyId)) {
-        return prev.filter(id => id !== toyId);
-      }
-      if (prev.length >= MAX_SELECTIONS) {
-        return prev;
-      }
-      return [...prev, toyId];
-    });
-  };
-
-  const handlePrint = () => {
-    const selected = toys.filter(t => selectedToys.includes(t.id));
-    print(selected, {
-      title: 'Bath Time Toys',
-      titleEmoji: '🛁',
-      bgColor: '#E6F7FF',
-      textColor: '#1A4D66',
-    });
-  };
 
   return (
     <div className="min-h-screen bg-theme-bg p-4 md:p-6">
@@ -109,13 +83,14 @@ export const BathBuddy: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <SelectableCard
-                      emoji={toy.emoji}
-                      name={toy.name}
-                      isSelected={selectedToys.includes(toy.id)}
-                      onClick={() => toggleToy(toy.id)}
-                      selectedColor="bg-cyan-400"
-                    />
+                    <motion.button
+                      onClick={() => speak(toy.name)}
+                      className="w-full rounded-3xl p-6 shadow-lg transition-all relative bg-white hover:scale-105 active:scale-95"
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <div className="text-8xl mb-3">{toy.emoji}</div>
+                      <div className="text-2xl font-bold text-theme-text">{toy.name}</div>
+                    </motion.button>
                   </motion.div>
                 ))}
               </motion.div>
@@ -123,22 +98,6 @@ export const BathBuddy: React.FC = () => {
           </AnimatePresence>
         </div>
       </div>
-
-      {/* Floating Print Button */}
-      <AnimatePresence>
-        {selectedToys.length > 0 && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            onClick={handlePrint}
-            className="fixed bottom-6 right-6 w-20 h-20 bg-cyan-500 text-white rounded-full shadow-xl flex flex-col items-center justify-center hover:bg-cyan-600 active:scale-95 transition-all z-50"
-          >
-            <span className="text-3xl">🖨️</span>
-            <span className="text-xs font-bold">{selectedToys.length}</span>
-          </motion.button>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
