@@ -36,6 +36,12 @@ const animalPresets: AnimalPreset[] = [
   { id: 'giraffe', name: 'Giraffe', emoji: '🦒', imageSrc: '/coloring/animals/giraffe.png' },
   { id: 'hippo', name: 'Hippo', emoji: '🦛', imageSrc: '/coloring/animals/hippo.png' },
   { id: 'monkey', name: 'Monkey', emoji: '🐵', imageSrc: '/coloring/animals/monkey.png' },
+  { id: 'cow-calf', name: 'Cow & Calf', emoji: '🐄', imageSrc: '/coloring/animals/cow-calf.png' },
+  { id: 'horse-foal', name: 'Horse & Foal', emoji: '🐴', imageSrc: '/coloring/animals/horse-foal.png' },
+  { id: 'deer-fawn', name: 'Deer & Fawn', emoji: '🦌', imageSrc: '/coloring/animals/deer-fawn.png' },
+  { id: 'sheep-lamb', name: 'Sheep & Lamb', emoji: '🐑', imageSrc: '/coloring/animals/sheep-lamb.png' },
+  { id: 'goat-kid', name: 'Goat & Kid', emoji: '🐐', imageSrc: '/coloring/animals/goat-kid.png' },
+  { id: 'bear-cub', name: 'Bear & Cub', emoji: '🐻', imageSrc: '/coloring/animals/bear-cub.png' },
 ];
 
 const paletteGroups = [
