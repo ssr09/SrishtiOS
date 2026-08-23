@@ -13,6 +13,7 @@ export const apps = [
   { id: 'bath', name: 'Bath Time', emoji: '🛁', color: 'bg-cyan-400' },
   { id: 'colors', name: 'Colors', emoji: '🎨', color: 'bg-pink-400' },
   { id: 'shapes', name: 'Shapes', emoji: '🔷', color: 'bg-purple-400' },
+  { id: 'shape-outlines', name: 'Shape Outlines', emoji: '▢', color: 'bg-sky-500' },
   { id: 'color-shapes', name: 'Color Shapes', emoji: '🟢', color: 'bg-lime-400' },
   { id: 'phonics', name: 'Phonics', emoji: '🔤', color: 'bg-sky-400' },
   { id: 'phonics-cards', name: 'Phonics Cards', emoji: 'Aa', color: 'bg-violet-400' },

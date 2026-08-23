@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useCallback, useEffect } from 'react';
 
-type AppRoute = 'home' | 'routine' | 'timer' | 'stars' | 'food' | 'bath' | 'colors' | 'shapes' | 'color-shapes' | 'phonics' | 'phonics-cards' | 'first-counting' | 'counting' | 'animals' | 'draw' | 'color-animals' | 'stories';
+type AppRoute = 'home' | 'routine' | 'timer' | 'stars' | 'food' | 'bath' | 'colors' | 'shapes' | 'shape-outlines' | 'color-shapes' | 'phonics' | 'phonics-cards' | 'first-counting' | 'counting' | 'animals' | 'draw' | 'color-animals' | 'stories';
 
-const validRoutes: AppRoute[] = ['home', 'routine', 'timer', 'stars', 'food', 'bath', 'colors', 'shapes', 'color-shapes', 'phonics', 'phonics-cards', 'first-counting', 'counting', 'animals', 'draw', 'color-animals', 'stories'];
+const validRoutes: AppRoute[] = ['home', 'routine', 'timer', 'stars', 'food', 'bath', 'colors', 'shapes', 'shape-outlines', 'color-shapes', 'phonics', 'phonics-cards', 'first-counting', 'counting', 'animals', 'draw', 'color-animals', 'stories'];
 
 const getRouteFromHash = (): AppRoute => {
   const hash = window.location.hash.slice(1); // Remove #
