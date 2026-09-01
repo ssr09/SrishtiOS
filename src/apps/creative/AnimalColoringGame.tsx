@@ -42,6 +42,7 @@ const animalPresets: AnimalPreset[] = [
   { id: 'sheep-lamb', name: 'Sheep & Lamb', emoji: '🐑', imageSrc: '/coloring/animals/sheep-lamb.png' },
   { id: 'goat-kid', name: 'Goat & Kid', emoji: '🐐', imageSrc: '/coloring/animals/goat-kid.png' },
   { id: 'bear-cub', name: 'Bear & Cub', emoji: '🐻', imageSrc: '/coloring/animals/bear-cub.png' },
+  { id: 'bluey-bingo', name: 'Bluey & Bingo', emoji: '🐶', imageSrc: '/coloring/animals/bluey-bingo.png' },
 ];
 
 const paletteGroups = [

@@ -41,6 +41,7 @@ describe('AnimalColoringGame', () => {
     expect(screen.getByRole('button', { name: /Monkey/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Cow & Calf/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Bear & Cub/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Bluey & Bingo/ })).toBeInTheDocument();
     expect(screen.queryByTestId('animal-coloring-canvas')).not.toBeInTheDocument();
   });
 
