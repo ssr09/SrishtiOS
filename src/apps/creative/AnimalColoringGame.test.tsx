@@ -80,7 +80,7 @@ describe('AnimalColoringGame', () => {
     expect(cursor).toContain('fill-rule="evenodd"');
     expect(cursor).toContain('M13 16h6M16 13v6');
     expect(cursor).toContain('opacity="0.65"');
-    expect(cursor).toContain('stroke-width="1.25"');
+    expect(cursor).toContain('stroke-width="0.75"');
     expect(cursor).toContain('16 16, crosshair');
   });
 });
