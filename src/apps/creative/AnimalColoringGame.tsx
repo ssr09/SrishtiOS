@@ -104,7 +104,7 @@ const hexToRgb = (hex: string): [number, number, number] => {
 };
 
 const getBrushCursor = (color: string) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 2a14 14 0 1 1 0 28 14 14 0 1 1 0-28Zm0 5a9 9 0 1 0 0 18 9 9 0 1 0 0-18Z" fill="${color}" fill-rule="evenodd"/><circle cx="16" cy="16" r="14" fill="none" stroke="#111827" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="#111827" stroke-width="1.5"/><path d="M13 16h6M16 13v6" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/><path d="M13 16h6M16 13v6" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 2a14 14 0 1 1 0 28 14 14 0 1 1 0-28Zm0 5a9 9 0 1 0 0 18 9 9 0 1 0 0-18Z" fill="${color}" fill-rule="evenodd"/><circle cx="16" cy="16" r="14" fill="none" stroke="#111827" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="#111827" stroke-width="1.5"/><g opacity="0.65"><path d="M13 16h6M16 13v6" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/><path d="M13 16h6M16 13v6" fill="none" stroke="#111827" stroke-width="1.25" stroke-linecap="round"/></g></svg>`;
   return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 16 16, crosshair`;
 };
 
