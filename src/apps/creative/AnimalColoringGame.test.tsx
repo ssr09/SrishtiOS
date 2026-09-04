@@ -75,6 +75,10 @@ describe('AnimalColoringGame', () => {
     fireEvent.click(screen.getByRole('button', { name: /Rhino/ }));
     fireEvent.click(screen.getByTestId('palette-color-#ff0066'));
 
-    expect(screen.getByTestId('animal-coloring-canvas').style.cursor).toContain('%23ff0066');
+    const cursor = decodeURIComponent(screen.getByTestId('animal-coloring-canvas').style.cursor);
+    expect(cursor).toContain('fill="#ff0066"');
+    expect(cursor).toContain('fill-rule="evenodd"');
+    expect(cursor).toContain('M15 19h8M19 15v8');
+    expect(cursor).toContain('19 19, crosshair');
   });
 });

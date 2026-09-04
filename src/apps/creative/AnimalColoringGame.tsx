@@ -104,9 +104,8 @@ const hexToRgb = (hex: string): [number, number, number] => {
 };
 
 const getBrushCursor = (color: string) => {
-  const stroke = color.toLowerCase() === '#ffffff' || color.toLowerCase() === '#fff7ad' ? '#111827' : '#ffffff';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="11" fill="${color}" stroke="${stroke}" stroke-width="4"/><circle cx="16" cy="16" r="14" fill="none" stroke="#111827" stroke-width="2"/></svg>`;
-  return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 16 16, crosshair`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38"><path d="M19 2a17 17 0 1 1 0 34 17 17 0 1 1 0-34Zm0 9a8 8 0 1 0 0 16 8 8 0 1 0 0-16Z" fill="${color}" fill-rule="evenodd"/><circle cx="19" cy="19" r="17" fill="none" stroke="#111827" stroke-width="1.5"/><circle cx="19" cy="19" r="8" fill="none" stroke="#111827" stroke-width="1.5"/><path d="M15 19h8M19 15v8" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/><path d="M15 19h8M19 15v8" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>`;
+  return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 19 19, crosshair`;
 };
 
 const useColoringSounds = () => {
