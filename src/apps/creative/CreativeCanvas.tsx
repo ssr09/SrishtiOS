@@ -71,8 +71,8 @@ export const CreativeCanvas: React.FC = () => {
       clientY = e.clientY;
     }
 
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const x = ((clientX - rect.left - canvas.clientLeft) / canvas.clientWidth) * canvas.width;
+    const y = ((clientY - rect.top - canvas.clientTop) / canvas.clientHeight) * canvas.height;
 
     ctx.fillStyle = selectedColor;
     ctx.beginPath();
